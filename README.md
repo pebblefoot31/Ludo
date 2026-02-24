@@ -23,12 +23,12 @@ The final board image depicts the position of each player's 4 pawns on the ludo 
 
 ## Building and Running
 
-- Clone this repository
-- Run `./rolls.sh -n 100 > rolls.txt` to generate random rolls, where -n argument passes the number of dice rolls in the game
-- Run `./Ludo rolls.txt > points.txt` to compute the final locations of pawns after processing the number of rolls 
-- Run `cat LudoBoard.jgr > Ludo.jgr` to initialize a fresh new board 
-- Run `cat points.txt >> Ludo.jgr` to append point plotting code to the blank ludo board
-- Run `./jgraph -P Ludo.jgr | ps2pdf - | convert -density 300 - -quality 100 Ludo.jpg`
-- Run `xdg-open Ludo.jpg` to view board
+1. Clone this repository
+2. Run `./rolls.sh -n 100 > rolls.txt` to generate random rolls, where -n argument passes the number of dice rolls in the game
+3. Run `./Ludo rolls.txt > points.txt` to compute the final locations of pawns after processing the number of rolls 
+4. Run `cat LudoBoard.jgr > Ludo.jgr` to initialize a fresh new board 
+5. Run `cat points.txt >> Ludo.jgr` to append point plotting code to the blank ludo board
+6. Run `./jgraph -P Ludo.jgr | ps2pdf - | convert -density 300 - -quality 100 Ludo.jpg`
+ 7. Run `xdg-open Ludo.jpg` to view board
 
 
