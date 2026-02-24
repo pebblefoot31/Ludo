@@ -1,0 +1,210 @@
+newgraph
+
+xaxis min 0 max 15 hash 1 mhash 0 size 5 
+    no_draw_hash_marks
+    no_auto_hash_labels
+yaxis min 0 max 15 hash 1 mhash 0 size 5
+    no_draw_hash_marks
+    no_auto_hash_labels
+        grid_lines grid_gray 0
+
+newcurve marktype box marksize 5 1 
+        linetype solid cfill 1 0 0
+    pts 3.5 7.5
+
+newcurve marktype box marksize 5 1 
+        linetype solid cfill 255 255 0
+    pts 11.5 7.5
+
+newcurve marktype box marksize 1 5 
+        linetype solid cfill 0 0 1
+    pts 7.5 3.5 
+
+newcurve marktype box marksize 1 5 
+        linetype solid cfill 0 1 0
+    pts 7.5 11.5
+
+
+newcurve marktype box marksize 1 1 
+        linetype solid cfill 1 0 0
+    pts 1.5 8.5 
+newcurve marktype box marksize 1 1 
+        linetype solid cfill 0 0 1
+    pts 6.5 1.5 
+newcurve marktype box marksize 1 1 
+        linetype solid cfill 255 255 0
+    pts 13.5 6.5 
+newcurve marktype box marksize 1 1 
+        linetype solid cfill 0 1 0 
+    pts 8.5 13.5
+
+shell : echo "" | awk '{ \
+          for (i = 1; i < 6; i += 1) { \
+             printf "newcurve pts 7 %d 8 %d linetype solid marktype none\n", i, i; \
+          } }'
+
+shell : echo "" | awk '{ \
+          for (i = 9; i < 14; i += 1) { \
+             printf "newcurve pts 7 %d 8 %d linetype solid marktype none\n", i, i; \
+          } }'
+
+
+
+shell : echo "" | awk '{ \
+          for (i = 6; i < 10; i += 1) { \
+             printf "newcurve pts %d 0  %d 15 linetype solid marktype none\n", i, i; \
+          } }'
+
+shell : echo "" | awk '{ \
+          for (i = 0; i < 7; i += 1) { \
+             printf "newcurve pts %d 6  %d 9 linetype solid marktype none\n", i, i; \
+          } }'
+
+shell : echo "" | awk '{ \
+          for (i = 8; i < 15; i += 1) { \
+             printf "newcurve pts %d 6  %d 9 linetype solid marktype none\n", i, i; \
+          } }'
+ 
+newcurve pts 15 0 15 15 linetype solid marktype none
+
+newcurve marktype triangle  marksize 3 1.5 mrotate 270
+        linetype solid cfill 1 0 0
+    pts 6.75 7.5 
+
+newcurve marktype triangle  marksize 3 1.5 mrotate 180
+        linetype solid cfill 0 1 0
+    pts 7.5 8.25 
+
+newcurve marktype triangle  marksize 3 1.5
+        linetype solid cfill 0 0 1
+    pts 7.5 6.75
+
+newcurve marktype triangle  marksize 3 1.5 mrotate 90
+        linetype solid cfill 255 255 0
+    pts 8.25 7.5
+
+
+
+newcurve marktype box  marksize 6 6
+        linetype solid cfill 0 0 1
+    pts 3 3
+
+newcurve marktype box  marksize 6 6
+        linetype solid cfill 255 255 0
+    pts 12 3
+
+newcurve marktype box  marksize 6 6
+        linetype solid cfill 0 1 0
+    pts 12 12
+
+newcurve marktype box  marksize 6 6
+        linetype solid cfill 1 0 0
+    pts 3 12
+
+shell : echo "" | awk '{ \
+          for (i = 3; i < 13; i += 9) { \
+            for (j = 3; j < 13; j += 9) { \
+               printf("newcurve marktype box marksize 4 4\n"); \
+               printf("linetype solid cfill 1 1 1\n"); \
+               printf("pts %f %f\n", i, j); \
+            } \
+          } }'
+
+shell : echo "" | awk '{ \
+          for (i = 2; i < 5; i += 2) { \
+            for (j = 2; j < 5; j += 2) { \
+               printf("newcurve marktype circle marksize 1 1\n"); \
+               printf("linetype solid cfill 0 0 1\n"); \
+               printf("pts %f %f\n", i, j); \
+            } \
+          } }'
+
+shell : echo "" | awk '{ \
+          for (i = 11; i < 14; i += 2) { \
+            for (j = 11; j < 14; j += 2) { \
+               printf("newcurve marktype circle marksize 1 1\n"); \
+               printf("linetype solid cfill 0 1 0\n"); \
+               printf("pts %f %f\n", i, j); \
+            } \
+          } }'
+
+
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 1 0 0
+    pts 2 11 
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 1 0 0
+    pts 4 11 
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 1 0 0
+    pts 2 13 
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 1 0 0
+    pts 4 13 
+
+
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 255 255 0
+    pts 11 2
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 255 255 0
+    pts 11 4
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 255 255 0
+    pts 13 4
+newcurve marktype circle marksize 1 1
+        linetype solid cfill 255 255 0
+    pts 13 2
+
+(* final positions of pawns appended here *)
+
+
+
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 4.5 8.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 1.5 8.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 3.5 8.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 5.5 7.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 8.5 5.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 9.5 6.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 13 11
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 6.5 11.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 9.5 6.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 12.5 6.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 13 2
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 4.5 8.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 6.5 10.5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 4 2
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 2 2
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 8.5 4.5
