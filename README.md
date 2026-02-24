@@ -24,7 +24,7 @@ The final board image depicts the position of each player's 4 pawns on the ludo 
 ## Building and Running
 
 1. Clone this repository
-2. Run `./rolls.sh -n 100 > rolls.txt` to generate random rolls, where -n argument passes the number of dice rolls in the game
+2. Run `./rolls.sh -n <num>` to generate a file of random rolls, where -n is a flag that allows you to pass the number of dice rolls into the game. The default is 20 rolls. This produces a file called rolls.txt, which contains all the randomly generated dice rolls
 3. Run `./Ludo rolls.txt > points.txt` to compute the final locations of pawns after processing the number of rolls 
 4. Run `cat LudoBoard.jgr > Ludo.jgr` to initialize a fresh new board 
 5. Run `cat points.txt >> Ludo.jgr` to append point plotting code to the blank ludo board

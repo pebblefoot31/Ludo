@@ -1,3 +1,5 @@
+#!/bin/bash
+
 count=20
 
 while getopts "n:" opt; do
@@ -7,6 +9,8 @@ while getopts "n:" opt; do
             exit 1 ;;
     esac
 done
+
+exec > rolls.txt
 
 
 for ((i=1; i<=count;i++)); do
