@@ -18,17 +18,18 @@ In a turn:
 - Otherwise, if all pieces are active and on the gameboard, move the piece the number of spaces that you rolled
 - In scenario outlined in step 3, roll again after rolling a 6 and move the pawn the number of spaces that is the sum of both rolls
 
-This gameplay is slightly modified as there is no capturing of other players pawns or skipped turns upon rolling three 6's in a row.
+This gameplay is slightly modified as there are no skipped turns upon rolling three 6's in a row.
 The final board image depicts the position of each player's 4 pawns on the ludo gameboard.
 
 ## Building and Running
 
 1. Clone this repository
-2. Run `./rolls.sh -n <num>` to generate a file of random rolls, where -n is a flag that allows you to pass the number of dice rolls into the game. The default is 20 rolls. This produces a file called rolls.txt, which contains all the randomly generated dice rolls
-3. Run `./Ludo rolls.txt > points.txt` to compute the final locations of pawns after processing the number of rolls 
-4. Run `cat LudoBoard.jgr > Ludo.jgr` to initialize a fresh new board 
-5. Run `cat points.txt >> Ludo.jgr` to append point plotting code to the blank ludo board
-6. Run `./jgraph -P Ludo.jgr | ps2pdf - | convert -density 300 - -quality 100 Ludo.jpg`
- 7. Run `xdg-open Ludo.jpg` to view board
+2. Make sure to be one level up from the untarred /jgraph directory 
+3. Run `make` to generate images corresponding to each of the data files in `input`
+4. Run `xdg-open rolls1.jpg` to view the generated image of the board
 
+## Notes
+- There is a shell script in this repo called `gen_num.sh`. This script generates random numbers that simulate dice rolls. The output is in a file called rolls.txt
+- Some of the file inputs may look unusual, and have numbers far larger than those on a 6-sided die. These kind of input files are just to create extreme boards for demonstration purposes.
 
+---
