@@ -1,15 +1,34 @@
-# Variables make it easy to change filenames later
-JGRAPH = ./jgraph/jgraph/jgraph
-SOURCE = Ludo.jgr
-OUTPUT = Ludo.jpg
+# variables
+CXX      = g++
+CXXFLAGS = -std=c++11
+JGRAPH   = ./jgraph/jgraph/jgraph
 
-# The 'all' target is what runs when you just type 'make'
-all: $(OUTPUT)
+# relevant files
+CPP_FILE    = Ludo.cpp
+EXE_FILE    = Ludo
+BOARD_BASE  = LudoBoard.jgr
+TEMP_JGR    = Ludo.jgr
+TEMP_POINTS = points.txt
 
-# This rule tells Make: "To create $(OUTPUT), I need $(SOURCE)"
-$(OUTPUT): $(SOURCE)
-		sh -c "$(JGRAPH) -P $(SOURCE) | ps2pdf - | convert -density 300 - -quality 100 $(OUTPUT)"
+#input files
+INPUTS = input/rolls1.txt input/rolls2.txt input/rolls3.txt input/rolls4.txt input/rolls5.txt
 
-# Clean up the generated image
+# steps to generate an image for each input file
+all: $(EXE_FILE)
+	@for file in $(INPUTS); do \
+		echo "Processing $$file..."; \
+        ./$(EXE_FILE) $$file > $(TEMP_POINTS); \
+		cat $(BOARD_BASE) > $(TEMP_JGR); \
+		cat $(TEMP_POINTS) >> $(TEMP_JGR); \
+		OUT_NAME=$$(basename $$file .txt).jpg; \
+		sh -c "$(JGRAPH) -P $(TEMP_JGR) | ps2pdf - | convert -density 300 - -quality 100 $$OUT_NAME"; \
+		echo "Created $$OUT_NAME"; \
+	done
+	@rm -f $(TEMP_POINTS) $(TEMP_JGR)
+
+#compile the ludo computation code
+$(EXE_FILE): $(CPP_FILE)
+	$(CXX) $(CXXFLAGS) $(CPP_FILE) -o $(EXE_FILE)
+
 clean:
-		rm -f $(OUTPUT)
+	rm -f $(EXE_FILE) *.jpg $(TEMP_POINTS) $(TEMP_JGR)
