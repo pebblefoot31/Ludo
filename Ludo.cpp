@@ -21,8 +21,8 @@ void read_rolls(string file_name, vector<vector<int>>& v) {
     string s;
 
 
-    int num;
-    int prev;
+    int num = 0;
+    int prev = 0;
     vector<int> r;
 
     while (getline(file,s)) {
@@ -51,7 +51,7 @@ void read_rolls(string file_name, vector<vector<int>>& v) {
 void init_player(vector<Pawn>& v) {
    
     for (int i = 0; i < 4; i++) {
-        Pawn p = {-1, 57, 0};
+        Pawn p = {-1, 56, 0};
         v.push_back(p);
 
     }
@@ -68,57 +68,117 @@ int open_player(vector<Pawn>& v) {
 }
 
 int find_closest_player(vector<Pawn>& v) {
-    
-    int max = 0;
+    int max_dist = -2; // Start below the base index of -1
     int ind = -1;
 
-    for (int i = 0; i < v.size(); i++) {
-        if (v[i].pathIndex > max && !(v[i].finished))
-            max = v[i].pathIndex;
+    for (int i = 0; i < (int)v.size(); i++) {
+        // Only consider pawns that are out of the base and not finished
+        if (v[i].pathIndex > max_dist && !v[i].finished && v[i].pathIndex != -1) {
+            max_dist = v[i].pathIndex;
             ind = i;
-    }
-
-    return ind;
-
-}
-
-void take_turn(vector<Pawn>& player, vector<int> roll) {
-
-    int curr = roll[0];
-    int total = roll[0];
-    int play = 0;
-
-    if (curr == 6) {
-         if ((play = open_player(player)) != -1) {
-            player[play].pathIndex += roll[1]; 
-            player[play].dist -= roll[1];
-    
-         //make the roll full and play the player that is closest to goal
-         } else {
-            play = find_closest_player(player);
-            total += roll[1];
-            if (player[play].dist >= total) {
-                player[play].pathIndex += total; //update path
-                player[play].dist -= total; //update distance from goal
-                
-            }
-         }
-    }
-    else {
-
-        //play the player that is closest to goal
-        play = find_closest_player(player);
-        
-        if (player[play].dist >= total) {
-            player[play].pathIndex += total; //update path
-            player[play].dist -= total; //update distance from goal
-            
         }
     }
 
-    if (player[play].dist == 0) {
+    // If no pawns are on the board, this returns -1
+    // Your take_turn function should check for this!
+    return ind;
+}
+
+void take_turn(vector<Pawn>& player, vector<int> roll, vector<pair<float, float>>& player_path) {
+    if (roll.empty()) return;
+
+    int curr = roll[0];
+    int second = (roll.size() > 1) ? roll[1] : 0;
+    int play = -1;
+
+    if (curr == 6) {
+        play = open_player(player); // Try to get someone out
+
+        if (play != -1) {
+            // SUCCESS: A new pawn enters the board
+            player[play].pathIndex = 0;
+            player[play].dist = 56; // Steps left to reach index 55
+
+            // Apply the bonus roll if it doesn't overshoot
+            if (second > 0 && player[play].dist >= second) {
+                player[play].pathIndex += second;
+                player[play].dist -= second;
+            }
+        } else {
+            // FAIL: No one in base, so move the closest player to home instead
+            play = find_closest_player(player);
+            int total = curr + second;
+            if (play != -1) {
+                // Ensure we don't move past the final space
+                total = min(total, player[play].dist);
+
+                if (player[play].dist >= total) {
+                    player[play].pathIndex += total;
+                    player[play].dist -= total;
+                }
+            }
+        }
+    } else {
+        // Standard turn (Not a 6)
+        play = find_closest_player(player);
+        int total = curr + second;
+        if (play != -1) {
+            // Ensure we don't move past the final space
+            total = min(total, player[play].dist);
+
+            if (player[play].dist >= total) {
+                player[play].pathIndex += total;
+                player[play].dist -= total;
+            }
+        }
+    }
+
+    // Update finished flag
+    if (play != -1 && player[play].dist == 0) {
         player[play].finished = 1;
     }
+}
+
+void capture_pawn(vector<Pawn>& player, vector<pair<float,float>>& player_path,
+                  vector<Pawn>& opp, vector<pair<float,float>>& opp_path) {
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            // CRITICAL: Only check coordinates if BOTH pawns are actually on the board
+            if (player[i].pathIndex >= 0 && opp[j].pathIndex >= 0) {
+
+                // Extra safety: ensure index doesn't exceed path vector size
+                if (player[i].pathIndex < (int)player_path.size() &&
+                    opp[j].pathIndex < (int)opp_path.size()) {
+
+                    float p_x = player_path[player[i].pathIndex].first;
+                    float p_y = player_path[player[i].pathIndex].second;
+
+                    float o_x = opp_path[opp[j].pathIndex].first;
+                    float o_y = opp_path[opp[j].pathIndex].second;
+
+                    if ((p_x == o_x) && (p_y == o_y)) {
+                        // Reset opponent to base
+                        opp[j].pathIndex = -1;
+                        opp[j].dist = 57;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+bool has_won(const vector<Pawn>& player) {
+
+    int finished_count = 0;
+    for (int i = 0; i < 4; i++) {
+        if (player[i].finished) {
+            finished_count++;
+        }
+    }
+
+    return (finished_count == 4);
 }
 
 void print_positions(vector<Pawn>& player, vector<pair<int,int>>& start, vector<pair<float,float>>& path, string color) {
@@ -137,14 +197,18 @@ void print_positions(vector<Pawn>& player, vector<pair<int,int>>& start, vector<
             cout << "linetype solid cfill 255 255 0\n"; 
         } 
 
+        // Add a small offset based on the pawn index 'p' so they don't overlap perfectly
+        // Add a small offset based on the pawn index 'p' so they don't overlap perfectly
         if (player[p].pathIndex == -1) {
             cout << "   pts " << start[p].first << " " << start[p].second << endl;
         } else {
-            cout << "   pts " << path[player[p].pathIndex].first << " " << path[player[p].pathIndex].second << endl;
+            float offset = p * 0.1;
+            cout << "   pts " << path[player[p].pathIndex].first + offset << " " << path[player[p].pathIndex].second + offset << endl;
         }
     }
     
 }
+
 
 int main(int argc, char *argv[]) {
     
@@ -235,21 +299,52 @@ int main(int argc, char *argv[]) {
     int count = 0;
     int play;
 
-    for (int i = 0; i < rolls.size()-1; i++) {
+    for (int i = 0; i < rolls.size(); i++) {
 
         if (i%4 == 0) {
-           take_turn(red, rolls[i]);
+           take_turn(red, rolls[i], red_path);
+           capture_pawn(red, red_path, green, green_path);
+           capture_pawn(red, red_path, yellow, yellow_path);
+           capture_pawn(red, red_path, blue, blue_path);
+
+           if (has_won(red)) {
+               break;
+           }
         }
 
         else if (i%4 == 1) {
-           take_turn(green, rolls[i]);
+           take_turn(green, rolls[i], green_path);
+           capture_pawn(green, green_path, red, red_path);
+           capture_pawn(green, green_path, yellow, yellow_path);
+           capture_pawn(green, green_path, blue, blue_path);
+
+           if (has_won(green)) {
+               break;
+           }
+
         }
 
         else if (i%4 == 2) {
-           take_turn(yellow, rolls[i]);
+           take_turn(yellow, rolls[i], yellow_path);
+           capture_pawn(yellow, yellow_path, green, green_path);
+           capture_pawn(yellow, yellow_path, red, red_path);
+           capture_pawn(yellow, yellow_path, blue, blue_path);
+
+           if (has_won(yellow)) {
+               break;
+           }
+
         }
+
         else if (i%4 == 3) {
-           take_turn(blue, rolls[i]);
+           take_turn(blue, rolls[i], blue_path);
+           capture_pawn(blue, blue_path, green, green_path);
+           capture_pawn(blue, blue_path, yellow, yellow_path);
+           capture_pawn(blue, blue_path, red, red_path);
+
+           if (has_won(blue)) {
+               break;
+           }
         }
     }
 
