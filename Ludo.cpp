@@ -3,14 +3,14 @@
 #include <set>
 #include <map>
 #include <fstream>
-
 using namespace std;
 
 struct Pawn {
     int pathIndex, dist, finished;
 };
 
-//rules are if you roll a 6 you get the next roll too (ignoring triple 6 roll)
+
+//reading rolls from a file into a vector
 void read_rolls(string file_name, vector<vector<int>>& v) {
 
     ifstream file(file_name);
@@ -19,8 +19,6 @@ void read_rolls(string file_name, vector<vector<int>>& v) {
     } 
 
     string s;
-
-
     int num = 0;
     int prev = 0;
     vector<int> r;
@@ -28,6 +26,7 @@ void read_rolls(string file_name, vector<vector<int>>& v) {
     while (getline(file,s)) {
         num = stoi(s);
         
+        //bundling the numbers following a 6 within the same vector
         if (prev==6 && r.size() < 2) {
             r.push_back(num);
             v.push_back(r);
@@ -48,6 +47,7 @@ void read_rolls(string file_name, vector<vector<int>>& v) {
     
 }
 
+//initializing the four pawns for each player
 void init_player(vector<Pawn>& v) {
    
     for (int i = 0; i < 4; i++) {
@@ -57,6 +57,7 @@ void init_player(vector<Pawn>& v) {
     }
 }
 
+//finding if there is a pawn that is inactive for player
 int open_player(vector<Pawn>& v) {
 
     for (int i =0; i < v.size(); i++) {
@@ -67,65 +68,72 @@ int open_player(vector<Pawn>& v) {
     return -1;
 }
 
+//finding the pawn that is furthest along for a player
 int find_closest_player(vector<Pawn>& v) {
-    int max_dist = -2; // Start below the base index of -1
+
+    int max_dist = -2; 
     int ind = -1;
 
     for (int i = 0; i < (int)v.size(); i++) {
-        // Only consider pawns that are out of the base and not finished
+
+        //only consider the pawns that are out of the base and not finished
         if (v[i].pathIndex > max_dist && !v[i].finished && v[i].pathIndex != -1) {
             max_dist = v[i].pathIndex;
             ind = i;
         }
     }
 
-    // If no pawns are on the board, this returns -1
-    // Your take_turn function should check for this!
+    //if no pawns are on the board, this returns -1
     return ind;
 }
 
+//logic for a player's turn
 void take_turn(vector<Pawn>& player, vector<int> roll, vector<pair<float, float>>& player_path) {
-    if (roll.empty()) return;
 
+    if (roll.empty()) { 
+        return;
+    }
+
+    
+    int play = -1; //index of pawn 
     int curr = roll[0];
-    int second = (roll.size() > 1) ? roll[1] : 0;
-    int play = -1;
+    int second = 0;
+
+    if (roll.size() > 1) {
+        second = roll[1];
+    }
 
     if (curr == 6) {
-        play = open_player(player); // Try to get someone out
+        play = open_player(player); //try to activate a pawn
 
         if (play != -1) {
-            // SUCCESS: A new pawn enters the board
             player[play].pathIndex = 0;
-            player[play].dist = 56; // Steps left to reach index 55
+            player[play].dist = 56; //steps left to reach HOME
 
-            // Apply the bonus roll if it doesn't overshoot
+            // apply the bonus roll if it doesn't overshoot
             if (second > 0 && player[play].dist >= second) {
                 player[play].pathIndex += second;
                 player[play].dist -= second;
             }
         } else {
-            // FAIL: No one in base, so move the closest player to home instead
+            //if no one is in base, move the closest player to home instead
             play = find_closest_player(player);
             int total = curr + second;
-            if (play != -1) {
-                // Ensure we don't move past the final space
-                total = min(total, player[play].dist);
 
+            if (play != -1) {
+                total = min(total, player[play].dist);
                 if (player[play].dist >= total) {
                     player[play].pathIndex += total;
                     player[play].dist -= total;
                 }
             }
         }
-    } else {
-        // Standard turn (Not a 6)
+    } else { //take a standard turn
         play = find_closest_player(player);
         int total = curr + second;
-        if (play != -1) {
-            // Ensure we don't move past the final space
-            total = min(total, player[play].dist);
 
+        if (play != -1) {
+            total = min(total, player[play].dist);
             if (player[play].dist >= total) {
                 player[play].pathIndex += total;
                 player[play].dist -= total;
@@ -133,34 +141,35 @@ void take_turn(vector<Pawn>& player, vector<int> roll, vector<pair<float, float>
         }
     }
 
-    // Update finished flag
+    //check if a pawn made it home and update finished flag
     if (play != -1 && player[play].dist == 0) {
         player[play].finished = 1;
     }
 }
 
+//capturing an opponent's pawn by landing on the same tile
 void capture_pawn(vector<Pawn>& player, vector<pair<float,float>>& player_path,
                   vector<Pawn>& opp, vector<pair<float,float>>& opp_path) {
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            // CRITICAL: Only check coordinates if BOTH pawns are actually on the board
+
             if (player[i].pathIndex >= 0 && opp[j].pathIndex >= 0) {
 
                 // Extra safety: ensure index doesn't exceed path vector size
                 if (player[i].pathIndex < (int)player_path.size() &&
                     opp[j].pathIndex < (int)opp_path.size()) {
 
+                    //determining positions of opponent and current player's pawns
                     float p_x = player_path[player[i].pathIndex].first;
                     float p_y = player_path[player[i].pathIndex].second;
-
                     float o_x = opp_path[opp[j].pathIndex].first;
                     float o_y = opp_path[opp[j].pathIndex].second;
 
+                    //sending opponent back to inactive if on the same square
                     if ((p_x == o_x) && (p_y == o_y)) {
-                        // Reset opponent to base
                         opp[j].pathIndex = -1;
-                        opp[j].dist = 57;
+                        opp[j].dist = 56;
                     }
                 }
             }
@@ -169,6 +178,7 @@ void capture_pawn(vector<Pawn>& player, vector<pair<float,float>>& player_path,
 }
 
 
+//checking if a player won the Ludo game
 bool has_won(const vector<Pawn>& player) {
 
     int finished_count = 0;
@@ -181,20 +191,23 @@ bool has_won(const vector<Pawn>& player) {
     return (finished_count == 4);
 }
 
+//outputting final positions of all opponents at end of die rolls processing
 void print_positions(vector<Pawn>& player, vector<pair<int,int>>& start, vector<pair<float,float>>& path, string color) {
+
+    float offset = 0;
 
     for (int p = 0; p < 4; p++) {
 
         cout << "newcurve marktype diamond marksize 0.5 0.5 \n";
 
         if (color == "red") {
-            cout << "linetype solid cfill 1 0 0\n"; 
+            cout << "linetype solid cfill 1 0.6 0.6\n"; 
         } else if (color == "green") {
-            cout << "linetype solid cfill 0 1 0\n"; 
+            cout << "linetype solid cfill 0.6 1 0.6\n"; 
         } else if (color == "blue") {
-            cout << "linetype solid cfill 0 0 1\n"; 
+            cout << "linetype solid cfill 0.6 0.8 1\n"; 
         } else if (color == "yellow") {
-            cout << "linetype solid cfill 255 255 0\n"; 
+            cout << "linetype solid cfill 1 1 0.6\n"; 
         } 
 
         // Add a small offset based on the pawn index 'p' so they don't overlap perfectly
@@ -202,7 +215,7 @@ void print_positions(vector<Pawn>& player, vector<pair<int,int>>& start, vector<
         if (player[p].pathIndex == -1) {
             cout << "   pts " << start[p].first << " " << start[p].second << endl;
         } else {
-            float offset = p * 0.1;
+            offset = p * 0.04;
             cout << "   pts " << path[player[p].pathIndex].first + offset << " " << path[player[p].pathIndex].second + offset << endl;
         }
     }
@@ -212,7 +225,7 @@ void print_positions(vector<Pawn>& player, vector<pair<int,int>>& start, vector<
 
 int main(int argc, char *argv[]) {
     
-    // RED PATH: Enters (1.5, 8.5), moves Right
+    //valid path points for red player
     vector<pair<float, float>> red_path = {
         {1.5, 8.5}, {2.5, 8.5}, {3.5, 8.5}, {4.5, 8.5}, {5.5, 8.5}, // Arm 1
         {6.5, 9.5}, {6.5, 10.5}, {6.5, 11.5}, {6.5, 12.5}, {6.5, 13.5}, {6.5, 14.5}, // Arm 2 down
@@ -229,54 +242,55 @@ int main(int argc, char *argv[]) {
         {1.5, 7.5}, {2.5, 7.5}, {3.5, 7.5}, {4.5, 7.5}, {5.5, 7.5}, {6.5, 7.5}  // HOME
     };
     
-    // BLUE PATH: Enters (6.5, 13.5), moves Up
+    //valid path points for blue player
     vector<pair<float, float>> blue_path = {
-        {6.5, 13.5}, {6.5, 12.5}, {6.5, 11.5}, {6.5, 10.5}, {6.5, 9.5},
-        {5.5, 8.5}, {4.5, 8.5}, {3.5, 8.5}, {2.5, 8.5}, {1.5, 8.5}, {0.5, 8.5},
-        {0.5, 7.5},
-        {0.5, 6.5}, {1.5, 6.5}, {2.5, 6.5}, {3.5, 6.5}, {4.5, 6.5}, {5.5, 6.5},
-        {6.5, 5.5}, {6.5, 4.5}, {6.5, 3.5}, {6.5, 2.5}, {6.5, 1.5}, {6.5, 0.5},
-        {7.5, 0.5},
-        {8.5, 0.5}, {8.5, 1.5}, {8.5, 2.5}, {8.5, 3.5}, {8.5, 4.5}, {8.5, 5.5},
-        {9.5, 6.5}, {10.5, 6.5}, {11.5, 6.5}, {12.5, 6.5}, {13.5, 6.5}, {14.5, 6.5},
-        {14.5, 7.5},
-        {14.5, 8.5}, {13.5, 8.5}, {12.5, 8.5}, {11.5, 8.5}, {10.5, 8.5}, {9.5, 8.5},
-        {8.5, 9.5}, {8.5, 10.5}, {8.5, 11.5}, {8.5, 12.5}, {8.5, 13.5}, {8.5, 14.5},
-        {7.5, 14.5},
-        {7.5, 13.5}, {7.5, 12.5}, {7.5, 11.5}, {7.5, 10.5}, {7.5, 9.5}, {7.5, 8.5}
+        {6.5, 1.5}, {6.5, 2.5}, {6.5, 3.5}, {6.5, 4.5}, {6.5, 5.5}, // Up to junction
+        {5.5, 6.5}, {4.5, 6.5}, {3.5, 6.5}, {2.5, 6.5}, {1.5, 6.5}, {0.5, 6.5}, // Left wing
+        {0.5, 7.5}, // Pivot
+        {0.5, 8.5}, {1.5, 8.5}, {2.5, 8.5}, {3.5, 8.5}, {4.5, 8.5}, {5.5, 8.5}, // Back from Left
+        {6.5, 9.5}, {6.5, 10.5}, {6.5, 11.5}, {6.5, 12.5}, {6.5, 13.5}, {6.5, 14.5}, // Top-Left
+        {7.5, 14.5}, // Top pivot
+        {8.5, 14.5}, {8.5, 13.5}, {8.5, 12.5}, {8.5, 11.5}, {8.5, 10.5}, {8.5, 9.5}, // Top-Right
+        {9.5, 8.5}, {10.5, 8.5}, {11.5, 8.5}, {12.5, 8.5}, {13.5, 8.5}, {14.5, 8.5}, // Right wing
+        {14.5, 7.5}, // Right pivot
+        {14.5, 6.5}, {13.5, 6.5}, {12.5, 6.5}, {11.5, 6.5}, {10.5, 6.5}, {9.5, 6.5}, // Back from Right
+        {8.5, 5.5}, {8.5, 4.5}, {8.5, 3.5}, {8.5, 2.5}, {8.5, 1.5}, {8.5, 0.5}, // Bottom-Right
+        {7.5, 0.5}, // ENTERING HOME
+        {7.5, 1.5}, {7.5, 2.5}, {7.5, 3.5}, {7.5, 4.5}, {7.5, 5.5}, {7.5, 6.5} // HOME (Moving Up)
     };
     
-    // GREEN PATH: Enters (8.5, 1.5), moves Down
+    //valid path points for green player
     vector<pair<float, float>> green_path = {
-        {8.5, 1.5}, {8.5, 2.5}, {8.5, 3.5}, {8.5, 4.5}, {8.5, 5.5},
-        {9.5, 6.5}, {10.5, 6.5}, {11.5, 6.5}, {12.5, 6.5}, {13.5, 6.5}, {14.5, 6.5},
-        {14.5, 7.5},
-        {14.5, 8.5}, {13.5, 8.5}, {12.5, 8.5}, {11.5, 8.5}, {10.5, 8.5}, {9.5, 8.5},
-        {8.5, 9.5}, {8.5, 10.5}, {8.5, 11.5}, {8.5, 12.5}, {8.5, 13.5}, {8.5, 14.5},
-        {7.5, 14.5},
-        {6.5, 14.5}, {6.5, 13.5}, {6.5, 12.5}, {6.5, 11.5}, {6.5, 10.5}, {6.5, 9.5},
-        {5.5, 8.5}, {4.5, 8.5}, {3.5, 8.5}, {2.5, 8.5}, {1.5, 8.5}, {0.5, 8.5},
-        {0.5, 7.5},
-        {0.5, 6.5}, {1.5, 6.5}, {2.5, 6.5}, {3.5, 6.5}, {4.5, 6.5}, {5.5, 6.5},
-        {6.5, 5.5}, {6.5, 4.5}, {6.5, 3.5}, {6.5, 2.5}, {6.5, 1.5}, {6.5, 0.5},
-        {7.5, 0.5},
-        {7.5, 1.5}, {7.5, 2.5}, {7.5, 3.5}, {7.5, 4.5}, {7.5, 5.5}, {7.5, 6.5}
+        {8.5, 13.5}, {8.5, 12.5}, {8.5, 11.5}, {8.5, 10.5}, {8.5, 9.5}, // Down to junction
+        {9.5, 8.5}, {10.5, 8.5}, {11.5, 8.5}, {12.5, 8.5}, {13.5, 8.5}, {14.5, 8.5}, // Right wing
+        {14.5, 7.5}, // Right pivot
+        {14.5, 6.5}, {13.5, 6.5}, {12.5, 6.5}, {11.5, 6.5}, {10.5, 6.5}, {9.5, 6.5}, // Back from Right
+        {8.5, 5.5}, {8.5, 4.5}, {8.5, 3.5}, {8.5, 2.5}, {8.5, 1.5}, {8.5, 0.5}, // Bottom-Right
+        {7.5, 0.5}, // Bottom pivot
+        {6.5, 0.5}, {6.5, 1.5}, {6.5, 2.5}, {6.5, 3.5}, {6.5, 4.5}, {6.5, 5.5}, // Bottom-Left
+        {5.5, 6.5}, {4.5, 6.5}, {3.5, 6.5}, {2.5, 6.5}, {1.5, 6.5}, {0.5, 6.5}, // Left wing
+        {0.5, 7.5}, // Left pivot
+        {0.5, 8.5}, {1.5, 8.5}, {2.5, 8.5}, {3.5, 8.5}, {4.5, 8.5}, {5.5, 8.5}, // Back from Left
+        {6.5, 9.5}, {6.5, 10.5}, {6.5, 11.5}, {6.5, 12.5}, {6.5, 13.5}, {6.5, 14.5}, // Top-Left
+        {7.5, 14.5}, // ENTERING HOME
+        {7.5, 13.5}, {7.5, 12.5}, {7.5, 11.5}, {7.5, 10.5}, {7.5, 9.5}, {7.5, 8.5} // HOME (Moving Down)
     };
-    
-    // YELLOW PATH: Enters (13.5, 6.5), moves Left
+
+    //valid path points for yellow player
     vector<pair<float, float>> yellow_path = {
         {13.5, 6.5}, {12.5, 6.5}, {11.5, 6.5}, {10.5, 6.5}, {9.5, 6.5},
         {8.5, 5.5}, {8.5, 4.5}, {8.5, 3.5}, {8.5, 2.5}, {8.5, 1.5}, {8.5, 0.5},
-        {7.5, 0.5},
+        {7.5, 0.5}, // Pivot Bottom
         {6.5, 0.5}, {6.5, 1.5}, {6.5, 2.5}, {6.5, 3.5}, {6.5, 4.5}, {6.5, 5.5},
         {5.5, 6.5}, {4.5, 6.5}, {3.5, 6.5}, {2.5, 6.5}, {1.5, 6.5}, {0.5, 6.5},
-        {0.5, 7.5},
+        {0.5, 7.5}, // Pivot Left
         {0.5, 8.5}, {1.5, 8.5}, {2.5, 8.5}, {3.5, 8.5}, {4.5, 8.5}, {5.5, 8.5},
         {6.5, 9.5}, {6.5, 10.5}, {6.5, 11.5}, {6.5, 12.5}, {6.5, 13.5}, {6.5, 14.5},
-        {7.5, 14.5},
+        {7.5, 14.5}, // Pivot Top
         {8.5, 14.5}, {8.5, 13.5}, {8.5, 12.5}, {8.5, 11.5}, {8.5, 10.5}, {8.5, 9.5},
-        {9.5, 8.5}, {10.5, 8.5}, {11.5, 8.5}, {12.5, 8.5},
-        {13.5, 7.5}, {12.5, 7.5}, {11.5, 7.5}, {10.5, 7.5}, {9.5, 7.5}, {8.5, 7.5}
+        {9.5, 8.5}, {10.5, 8.5}, {11.5, 8.5}, {12.5, 8.5}, {13.5, 8.5}, {14.5, 8.5},
+        {14.5, 7.5}, // Pivot Right (ENTERING HOME)
+        {13.5, 7.5}, {12.5, 7.5}, {11.5, 7.5}, {10.5, 7.5}, {9.5, 7.5}, {8.5, 7.5} // HOME LANE
     };
 
     vector<Pawn> red;
@@ -299,6 +313,7 @@ int main(int argc, char *argv[]) {
     int count = 0;
     int play;
 
+    //iterate through all rolls, taking turns between four players
     for (int i = 0; i < rolls.size(); i++) {
 
         if (i%4 == 0) {
@@ -348,12 +363,13 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    //starting places for all players ('inactive' pawns)
     std::vector<std::pair<int, int>> blue_start = {{2, 4}, {4, 2}, {2, 2}, {4, 4}};
     std::vector<std::pair<int, int>> green_start = {{11, 13}, {11, 11}, {13, 11}, {13, 13}};
     std::vector<std::pair<int, int>> red_start = {{2, 11}, {4, 11}, {2, 13}, {4, 13}};
     std::vector<std::pair<int, int>> yellow_start = {{11, 2}, {11, 4}, {13, 2}, {13, 4}};
 
-    // pipe final locations into file
+    //outputting final positions of all players
     print_positions(red, red_start, red_path, "red");
     print_positions(green, green_start, green_path, "green");
     print_positions(yellow, yellow_start, yellow_path, "yellow");

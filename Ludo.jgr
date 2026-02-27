@@ -13,7 +13,7 @@ newcurve marktype box marksize 5 1
     pts 3.5 7.5
 
 newcurve marktype box marksize 5 1 
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 11.5 7.5
 
 newcurve marktype box marksize 1 5 
@@ -21,7 +21,7 @@ newcurve marktype box marksize 1 5
     pts 7.5 3.5 
 
 newcurve marktype box marksize 1 5 
-        linetype solid cfill 0 1 0
+        linetype solid cfill 0 0.4 0
     pts 7.5 11.5
 
 
@@ -32,10 +32,10 @@ newcurve marktype box marksize 1 1
         linetype solid cfill 0 0 1
     pts 6.5 1.5 
 newcurve marktype box marksize 1 1 
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 13.5 6.5 
 newcurve marktype box marksize 1 1 
-        linetype solid cfill 0 1 0 
+        linetype solid cfill 0 0.4 0 
     pts 8.5 13.5
 
 shell : echo "" | awk '{ \
@@ -72,7 +72,7 @@ newcurve marktype triangle  marksize 3 1.5 mrotate 270
     pts 6.75 7.5 
 
 newcurve marktype triangle  marksize 3 1.5 mrotate 180
-        linetype solid cfill 0 1 0
+        linetype solid cfill 0 0.4 0
     pts 7.5 8.25 
 
 newcurve marktype triangle  marksize 3 1.5
@@ -80,7 +80,7 @@ newcurve marktype triangle  marksize 3 1.5
     pts 7.5 6.75
 
 newcurve marktype triangle  marksize 3 1.5 mrotate 90
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 8.25 7.5
 
 
@@ -90,11 +90,11 @@ newcurve marktype box  marksize 6 6
     pts 3 3
 
 newcurve marktype box  marksize 6 6
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 12 3
 
 newcurve marktype box  marksize 6 6
-        linetype solid cfill 0 1 0
+        linetype solid cfill 0 0.4 0
     pts 12 12
 
 newcurve marktype box  marksize 6 6
@@ -123,7 +123,7 @@ shell : echo "" | awk '{ \
           for (i = 11; i < 14; i += 2) { \
             for (j = 11; j < 14; j += 2) { \
                printf("newcurve marktype circle marksize 1 1\n"); \
-               printf("linetype solid cfill 0 1 0\n"); \
+               printf("linetype solid cfill 0 0.4 0\n"); \
                printf("pts %f %f\n", i, j); \
             } \
           } }'
@@ -144,16 +144,16 @@ newcurve marktype circle marksize 1 1
 
 
 newcurve marktype circle marksize 1 1
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 11 2
 newcurve marktype circle marksize 1 1
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 11 4
 newcurve marktype circle marksize 1 1
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 13 4
 newcurve marktype circle marksize 1 1
-        linetype solid cfill 255 255 0
+        linetype solid cfill 0.9 0.8 0
     pts 13 2
 
 (* final positions of pawns appended here *)
@@ -161,50 +161,50 @@ newcurve marktype circle marksize 1 1
 
 
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 1 0 0
-   pts 4.5 8.5
+linetype solid cfill 1 0.6 0.6
+   pts 6.5 7.5
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 1 0 0
-   pts 1.5 8.5
+linetype solid cfill 1 0.6 0.6
+   pts 6.54 7.54
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 1 0 0
-   pts 3.5 8.5
+linetype solid cfill 1 0.6 0.6
+   pts 6.58 7.58
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 1 0 0
-   pts 5.5 7.5
+linetype solid cfill 1 0.6 0.6
+   pts 2.62 7.62
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 1 0
-   pts 8.5 5.5
+linetype solid cfill 0.6 1 0.6
+   pts 7.5 8.5
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 1 0
-   pts 9.5 6.5
+linetype solid cfill 0.6 1 0.6
+   pts 7.54 8.54
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 1 0
-   pts 13 11
+linetype solid cfill 0.6 1 0.6
+   pts 7.58 8.58
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 1 0
-   pts 6.5 11.5
+linetype solid cfill 0.6 1 0.6
+   pts 7.62 8.62
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 255 255 0
-   pts 9.5 6.5
+linetype solid cfill 1 1 0.6
+   pts 8.5 7.5
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 255 255 0
-   pts 12.5 6.5
+linetype solid cfill 1 1 0.6
+   pts 8.54 7.54
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 255 255 0
-   pts 13 2
+linetype solid cfill 1 1 0.6
+   pts 8.58 7.58
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 255 255 0
-   pts 4.5 8.5
+linetype solid cfill 1 1 0.6
+   pts 13 4
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 0 1
-   pts 6.5 10.5
+linetype solid cfill 0.6 0.8 1
+   pts 7.5 6.5
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 0 1
-   pts 4 2
+linetype solid cfill 0.6 0.8 1
+   pts 7.54 6.54
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 0 1
-   pts 2 2
+linetype solid cfill 0.6 0.8 1
+   pts 7.58 6.58
 newcurve marktype diamond marksize 0.5 0.5 
-linetype solid cfill 0 0 1
-   pts 8.5 4.5
+linetype solid cfill 0.6 0.8 1
+   pts 4 4
