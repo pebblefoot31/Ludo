@@ -1,5 +1,6 @@
 newgraph
 
+(* Initial graph  *)
 xaxis min 0 max 15 hash 1 mhash 0 size 5 
     no_draw_hash_marks
     no_auto_hash_labels
@@ -8,6 +9,8 @@ yaxis min 0 max 15 hash 1 mhash 0 size 5
     no_auto_hash_labels
         grid_lines grid_gray 0
 
+
+(* Long colored paths leading to home base  *)
 newcurve marktype box marksize 5 1 
         linetype solid cfill 1 0 0
     pts 3.5 7.5
@@ -25,6 +28,8 @@ newcurve marktype box marksize 1 5
     pts 7.5 11.5
 
 
+(* Each player's starting colored square *)
+
 newcurve marktype box marksize 1 1 
         linetype solid cfill 1 0 0
     pts 1.5 8.5 
@@ -37,6 +42,8 @@ newcurve marktype box marksize 1 1
 newcurve marktype box marksize 1 1 
         linetype solid cfill 0 0.4 0 
     pts 8.5 13.5
+
+(* Some gridlines *)
 
 shell : echo "" | awk '{ \
           for (i = 1; i < 6; i += 1) { \
@@ -67,6 +74,9 @@ shell : echo "" | awk '{ \
  
 newcurve pts 15 0 15 15 linetype solid marktype none
 
+
+(* Home base triangles  *)
+
 newcurve marktype triangle  marksize 3 1.5 mrotate 270
         linetype solid cfill 1 0 0
     pts 6.75 7.5 
@@ -84,6 +94,7 @@ newcurve marktype triangle  marksize 3 1.5 mrotate 90
     pts 8.25 7.5
 
 
+(* Main colored box with pawn origin circle at each corner *)
 
 newcurve marktype box  marksize 6 6
         linetype solid cfill 0 0 1

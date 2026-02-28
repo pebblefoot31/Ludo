@@ -11,6 +11,8 @@ Goal: Be the first player to bring all 4 of your pawns to 'home', which is your 
 Gameplay:
 
 1. Each player takes turns rolling a single die
+2. Players move their pawn across the board based on die roll
+3. First player to get all 4 pawns into the home base (center triangle) wins
 
 In a turn:
 
