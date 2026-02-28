@@ -21,6 +21,14 @@ In a turn:
 This gameplay is slightly modified as there are no skipped turns upon rolling three 6's in a row.
 The final board image depicts the position of each player's 4 pawns on the ludo gameboard.
 
+
+Here is an image of an example board. The diamonds represent pawns for each color. Each pawn starts at its respective colored box, and travels on the white squares around the board into its color home strip.
+The colored triangles in the center represent home. 
+
+
+!(Example Jgraph Ludo Board)(example.jpg "Jgraph Ludo Game")
+
+
 ## Building and Running
 
 1. Clone this repository
@@ -28,8 +36,9 @@ The final board image depicts the position of each player's 4 pawns on the ludo 
 3. Run `make` to generate images corresponding to each of the data files in `input`
 4. Run `xdg-open rolls1.jpg` to view the generated image of the board
 
-## Notes
+## Additional Notes
 - There is a shell script in this repo called `gen_num.sh`. This script generates random numbers that simulate dice rolls. The output is in a file called rolls.txt
 - Some of the file inputs may look unusual, and have numbers far larger than those on a 6-sided die. These kind of input files are just to create extreme boards for demonstration purposes.
+- Sometimes two pawns of the same player can be on the same square in the board. There is a slight offset for each pawn so that all pawns are visible in this overlap scenario.
 
 ---
