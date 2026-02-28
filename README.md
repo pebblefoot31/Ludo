@@ -25,9 +25,7 @@ The final board image depicts the position of each player's 4 pawns on the ludo 
 Here is an image of an example board. The diamonds represent pawns for each color. Each pawn starts at its respective colored box, and travels on the white squares around the board into its color home strip.
 The colored triangles in the center represent home. 
 
-
-!(Example Jgraph Ludo Board)(example.jpg "Jgraph Ludo Game")
-
+<img src="example.jpg" alt="Example Jgraph Ludo Board">
 
 ## Building and Running
 
