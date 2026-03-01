@@ -1,0 +1,33 @@
+(* white chess knight *)
+newgraph
+xaxis min 0 max 10 nodraw
+yaxis min 0 max 10 nodraw
+
+(* left ear *)
+newline gray 0 linethickness 10 pts
+    3.5 8.5 3.0 10 4.5 8.5
+
+(* body *)
+newline bezier poly pfill 1 linethickness 10 pts
+    2 1 6 1 5.5 4 6 5 
+    4 2 4 4 1 1.25
+    -1.5 6 2.5 4 2.5 8
+    3.5 8.25 4.5 8.75 6 9
+    8 9 10 7 10 0
+    7 0 4 0 2 0
+    2 .25 2 .75 2 1
+
+(* mouth *)
+newline bezier linethickness 10 pts
+    .75 2 1.25 2.25 2.25 3.25 2.5 3.25
+
+(* eye *)
+newline bezier poly pfill 1 linethickness 10 pts
+     4.5 7.75 4 7.75 3.5 8 3 6.75 
+     3.5 6.5 4.5 6.5 4.5 7.75
+
+(* right ear *)
+newline poly gray 1 pfill 1 linethickness 10 pts
+    5 8.5 5.5 10 6 8.5
+newline gray 0 linethickness 10 pts
+    5 8.5 5.5 10 6 8.5

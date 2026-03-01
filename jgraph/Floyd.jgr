@@ -1,0 +1,42 @@
+(* Nothing fancy with any of the axes. 
+   I probably should specify a max for 
+   the y-axis, but the graph looks fine
+   without it. *)
+
+newgraph
+xaxis min 0 max 960 size 7
+  hash 160 
+  hash_labels fontsize 14
+  label fontsize 18 : Nodes
+
+yaxis min 0 size 5
+  hash_labels fontsize 14
+  label fontsize 18 : Time (seconds)
+
+
+(* Put the legend into the upper-left hand
+   corner of the graph *)
+
+legend defaults hjl vjt x 25 y 3.00 fontsize 14  
+
+(* For each of the three curves, grab the data from
+   the file ap-timings.txt.  The x values are the
+   second words on each line, and the y values are 
+   the last words.  Each line is labeled on its first
+   word, and I use grep to isolate lines with the
+   labels that I want. *)
+
+newline marktype circle color 0 0 0 
+pts 
+  shell : grep FW ap-timings.txt | awk '{ print $2, $NF }'
+  label : Floyd-Warshall, the original implementation
+
+newline marktype circle color 1 0 0 
+pts 
+  shell : grep DIJKSTRA ap-timings.txt | awk '{ print $2, $NF }'
+  label : Dijsktra
+
+newline marktype circle color .5 0 .5 
+pts 
+  shell : grep SIMD ap-timings.txt | awk '{ print $2, $NF }'
+  label : Floyd-Warshall - SIMD

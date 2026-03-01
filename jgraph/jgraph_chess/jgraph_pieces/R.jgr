@@ -1,0 +1,16 @@
+(* white chess rook *)
+newgraph
+xaxis min 0 max 10 nodraw
+yaxis min 0 max 10 nodraw
+
+newline poly pfill 1 linethickness 10 pts
+    0 0 2 2 8 2 10 0
+
+newline poly pfill 1 linethickness 10 pts
+    1.5 2 1.5 3 8.5 3 8.5 2
+
+newline poly pfill 1 linethickness 10 pts
+    2 3 2 8 8 8 8 3
+
+newline poly pfill 1 linethickness 10 pts
+    1 8 1 10 3 10 3 9 4 9 4 10 6 10 6 9 7 9 7 10 9 10 9 8

@@ -1,0 +1,13 @@
+newgraph
+xaxis min 0 max 5 
+yaxis min 0 size 2 nodraw 
+
+newcurve marktype box linetype solid label : Line number one
+   pts 0 6  1 9  2 11  3 14  4 18 5 20
+newcurve marktype triangle linetype dashed color 1 0 0 label : Line number two
+   pts 0 3  1 4  2 7  3 9  4 10 5 13
+newcurve marktype none linetype dotdotdash color 1 0 1 label : And number three
+         pts 0 0  1 2  2 3  3 5  4 6  5 9
+
+legend defaults font Times-Italic fontsize 20 rotate 30 hjl vjb x 1 y 10
+

@@ -1,0 +1,21 @@
+newgraph
+  xaxis min 0 max 10 hash 1 mhash 0 size 5
+  yaxis min 0 max 8 hash 1 mhash 0 size 5
+        grid_lines grid_gray .7
+
+newstring hjl vjc x 1 y 1 : String #1
+
+newstring hjr vjt x 9 y 1 
+          fontsize 20 lcolor 1 0 0 : String #2
+
+copystring hjl vjb x 1 y 2 
+          fontsize 16 font Times-Italic : String #3
+
+newstring hjr vjt x 9 y 2 
+          fontsize 16 font Helvetica : String #4
+
+newstring hjc vjc x 5 y 2 
+          fontsize 16 font Symbol : String #5
+
+newstring hjl vjb fontsize 45 
+          font Courier rotate 90 x 5 y 2.5 : String #6

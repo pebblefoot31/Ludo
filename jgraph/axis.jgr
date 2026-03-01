@@ -1,0 +1,29 @@
+newgraph
+
+xaxis 
+  min 0 max 100
+  hash 15 
+  mhash 2            (* i.e. minor hashes at the 5's and 10's *)
+  color 1 0 0
+  label : This is the X axis
+  draw_at 10
+
+yaxis 
+  min 1 max 1000
+  size 2
+  log
+  no_draw_hash_marks
+  label : And this is the Y axis
+  color 0 0 .75
+
+newline color 1 0 1 
+  pts 10 1 
+      20 5 
+      30 10 
+      40 20 
+      50 100 
+      60 110 
+      70 500 
+      80 800 
+      90 1000
+      100 1

@@ -1,0 +1,51 @@
+newgraph
+
+
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 5 4
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 5 1
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 5 3
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 1 0 0
+   pts 2 7
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 7 5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 7 4
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 13 11
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 1 0
+   pts 5 7
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 7 7
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 7 10
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 13 2
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 255 255 0
+   pts 4 5
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 4 7
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 4 2
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 2 2
+newcurve marktype diamond marksize 0.5 0.5 
+linetype solid cfill 0 0 1
+   pts 7 4

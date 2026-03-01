@@ -1,0 +1,16 @@
+(* copygraph.jgr *)
+
+newgraph
+xaxis min 0 max 10 size 1 label fontsize 16 font Times-Italic : Graph 1
+yaxis min 0 max 10 size 1
+
+newcurve marktype box linetype solid pts 1 10 2 8 5 5 8 3 10 2
+
+(* I copy the graph and change the x axis label.
+   x_translate 2 says to translate this graph two inches
+   horizontally.  You can put negative numbers there as well. *)
+
+copygraph 
+x_translate 2
+xaxis label : Graph 2
+newcurve marktype box linetype solid pts 10 10 8 8 5 5 8 3 10 2

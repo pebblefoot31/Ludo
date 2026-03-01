@@ -1,0 +1,82 @@
+newgraph
+
+(* Set up a "graph" to be a football field.
+   There will be two points on the X axis, one
+   for the University of Tennessee, and one
+   for Princeton. That's why we use
+   no_auto_hash_labels *)
+
+xaxis 
+  min .2 max 2.8 size 5
+  no_auto_hash_labels mhash 0 hash 1 shash 1
+
+(* The Y axis has no labels. *)
+
+yaxis 
+  min 0 max 10 size 6 
+  nodraw
+
+(* Draw the football field.as one big green mark. *)
+
+newcurve marktype box marksize 2.6 10 cfill 0 .5 0 pts 1.5 5
+
+(* Draw 10-yard lines as two lines with a gap in the middle for
+   the yard number. *)
+
+shell : echo "" | awk '{ \
+          for (i = 1; i < 10; i += 1) { \
+             printf ("newline gray 1 pts 0.2 %d 1.4 %d\n", i, i); \
+             printf ("newline gray 1 pts 1.6 %d 2.8 %d\n", i, i); \
+          } }'
+
+(* Draw 10-yard labels.  I do this by specifying a string which I
+   never draw, and then copying it. *)
+
+newstring hjc vjc font Times-Italic lgray 1 fontsize 14 x 1.5
+
+shell : echo "" | awk '{ \
+          for (i = 1; i < 6; i += 1) { \
+             printf "copystring y %d : %d0\n",i, i \
+          } }'
+         
+shell : echo "" | awk '{ \
+          for (i = 6; i < 10; i += 1) { \
+             printf "copystring y %d : %d0\n",i, 10-i \
+          } }'
+         
+(* Draw 1-yard marks *)
+
+shell : echo "" | awk '{ \
+          for (i = 0; i < 10; i += .1) { \
+             printf "newline gray 1 pts 0.97 %f 1.03 %f\n", i, i; \
+             printf "newline gray 1 pts 1.97 %f 2.03 %f\n", i, i; \
+          } }'
+         
+(* Now, draw footballs *)
+
+newcurve eps football.eps marksize .35 1 pts
+  shell : echo "" | awk '{ for (i = 0; i < 10; i++) printf "1, %.1f\n", i+.5 }'
+  2 .5
+
+(* Draw team names *)
+
+xaxis
+hash_labels fontsize 20
+hash_label at 1 : University of\
+Tennessee
+
+hash_label at 2 : Princeton
+ 
+(* Draw the label, and make a football legend by hand,
+   without using the legend feature of jgraph *)
+
+newstring fontsize 28 hjc vjt x 3.4 y 9
+  : University\
+Football\
+Budgets
+
+newcurve eps football.eps marksize .35 1 pts 3.35 3
+
+newstring fontsize 20 hjl vjc x 3.55 y 3 : =
+copystring hjc vjc x 3.4 y 2 : 1 Gazillion\
+Dollars

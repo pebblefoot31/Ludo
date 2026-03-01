@@ -1,0 +1,6 @@
+newgraph
+xaxis min 0 max 3 hash 1 mhash 0 size 1
+yaxis min 0 max 9 size 3 hash 1 mhash 0
+
+newline pts
+  shell : echo "" | awk '{ for (i = 0; i <= 3.05; i += .1) print i, i*i }'

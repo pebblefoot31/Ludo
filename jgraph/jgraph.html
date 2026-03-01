@@ -1,0 +1,1103 @@
+<pre>
+jgraph(1)                                                            jgraph(1)
+
+
+
+NAME
+       jgraph − filter for graph plotting to postscript
+
+SYNTAX
+       jgraph [−p] [−P] [−L] [−comments] [filename ...]
+
+DESCRIPTION
+       Jgraph  takes the description of a graph or graphs and produces a post‐
+       script file on the standard output.  Jgraph is ideal for  plotting  any
+       mixture  of  scatter  point graphs, line graphs, and/or bar graphs, and
+       embedding the output into LaTeX, or any other  text  processing  system
+       which can read postscript.
+
+       Jgraph reads its input from the specified files.  If no files are spec‐
+       ified, then it reads from standard input.
+
+       The graph description language is simple enough  to  get  nice  looking
+       graphs  with  a minimum of effort, yet powerful enough to give the user
+       the flexibility to tailor the appearance of the graph  to  his  or  her
+       individual  preferences.   This  includes  plotting multiple graphs and
+       laying them out separately on the page (or pages).
+
+       As an example, if the user wanted to  simply  plot  the  points  (2,3),
+       (4,5), (1,6), the following would be enough of a specification file:
+
+            newgraph
+            newcurve pts 2 3 4 5 1 6
+
+       Now,  if the user wanted to spruce the graph up by adding labels to the
+       axes, connecting the points, and titling  the  graph,  then  the  input
+       could change to:
+
+            newgraph
+            newcurve pts 2 3 4 5 1 6 linetype solid
+            xaxis label : X axis
+            yaxis label : Y axis
+            title : This is an example graph
+
+       If  the  user instead wanted this to be a bar graph with different end‐
+       points on the axes, he/she could simply change the input to:
+
+            newgraph
+            xaxis min 0 max 5 label : X axis
+            yaxis min 0 max 6 label : Y axis
+            newcurve pts 2 3 4 5 1 6 marktype xbar
+            title : This is an example bar graph
+
+       There are many more features of the  description  language,  which  are
+       described  below  in the next section.  Features which are not embedded
+       within the description language are: line and  function  interpolation,
+       function plotting, and pie graphs.  The latter is impossible to do with
+       the aid of jgraph, however, the others  can  be  effected  with  jgraph
+       mixed with awk or c.  See FUNCTION PLOTTING AND OTHER NON‐INHERENT FEA‐
+       TURES below.
+
+       Also below is a section HINTS AND EXAMPLE GRAPHS, which may  give  good
+       ideas on how to use jgraph more effectively.
+
+OPTIONS
+       −P     The −P option produces postscript which can be piped directly to
+              lpr, which can be displayed in an Xwindows environment  with  gs
+              (ghostscript).  Without this option, the output should be embed‐
+              ded within LaTeX or a similar text processing system.
+
+       −L     The −L option produces a landscape plot.
+
+       −p     The −p option re‐prints the input on the standard  output,  only
+              with all the defaults made explicit.  This is useful for letting
+              the user do his/her own special  formatting,  as  it  shows  the
+              explicit  values  that  the defaults assume, so that they can be
+              manipulated.
+
+       −comments
+              This option makes jgraph put  comments  into  the  output  post‐
+              script.   These  make it easier for the user to wade through the
+              final postscript if necessary.
+
+THE DESCRIPTION LANGUAGE
+       The  description  language  is   essentially   keywords   followed   by
+       attributes.   All  keywords and attributes except for string attributes
+       are tokens ‐‐ non‐white‐space  characters  surrounded  by  white‐space.
+       Special  tokens  are ‘‘(*’’, ‘‘*)’’, ‘‘include’’, ‘‘:’’, and ‘‘shell’’,
+       which denote comments, include‐file statements, string identifiers, and
+       shell‐include statements:
+
+       Comments
+              Comments  are  surrounded by the tokens ‘‘(*’’ ‘‘*)’’ as in Mod‐
+              ula‐2 (except that here, the tokens must be surrounded by white‐
+              space).  Comments may be nested.  If the comment runs to the end
+              of a file, the last ‘‘*)’’ may be omitted.
+
+       Include−file statements
+              The token following an ‘‘include’’ token is  expected  to  be  a
+              file  name.   The result of the statement is to include the con‐
+              tents of the file at that point.  Include‐file statments can  be
+              nested within included files, and within shell includes.
+
+       Strings
+              In  places  where  strings  are  required (as in graph and curve
+              labels), they are denoted by the token ‘‘:’’.  The second  char‐
+              acter  after  the  ‘‘:’’ starts the string, and the next newline
+              character terminates it.  Thus, the string ‘‘Graph #1’’  can  be
+              denoted as:
+
+                   : Graph #1<newline>
+
+              or
+
+                   :<newline>
+                   Graph #1<newline>
+
+              One  can  get  multiline  strings by making a backslash the last
+              character before the newline on all but the last  line.   Notice
+              that  in strings white‐space is not ignored.  This way of denot‐
+              ing strings allows the user to embed leading and  trailing  spa‐
+              ces,  as  well as the null string.  For example, the null string
+              ‘‘’’ is represented by:
+
+                   : <newline>
+
+              Once a string has been started, it may  contain  any  character.
+              Specifically,  it may contain the sequence ‘‘(*’’, ‘‘shell’’, or
+              ‘‘include’’ without starting a  comment  or  including  a  file.
+              Each  line  of  a string must contain less than 1000 characters.
+              Otherwise string sizes are limited only by the size of memory.
+
+       Shell−include statements
+              Shell include statements are of the form ‘‘shell’’,  ‘‘:’’,  and
+              then  a  string.  The result of the statement is that the string
+              is executed (using popen, which passes the string  to  sh),  and
+              the  standard  output is included at that point.  Shell‐includes
+              can be freely  nested  within  include‐files  and  other  shell‐
+              includes.   Shell  commands  may be more than one line, but must
+              not exceed 1000 characters.  The shell statement  is  not  (yet)
+              available on VMS.
+
+       Notation
+              In the descriptions below:
+
+              tk {integer}
+                     means that token tk must be followed by an integer.
+
+              tk [integer]
+                     means  that tk may be followed by an integer, but doesn’t
+                     have to.  In most cases, if tk  is  not  followed  by  an
+                     integer, then the command denoted by tk is ignored.
+
+              tk [{integer} {integer}]*
+                     means that tk must be followed by an even number of inte‐
+                     gers.
+
+              Supported types other than integer  are:  {float}  for  floating
+              point  entries, {token} for any token, and {string} for a string
+              as defined above.
+
+       TOP‐LEVEL DESCRIPTION COMMANDS
+
+              newgraph
+                     This starts editing a new graph (see GRAPH  EDITING  COM‐
+                     MANDS).   Note  that  multiple graphs may be drawn on the
+                     same page.
+
+              graph {integer}
+                     This edits the graph denoted by {integer}.  If the  graph
+                     doesn’t  exist,  then  this command creates it and starts
+                     editing it.  Newgraph is simply an abbreviation for graph
+                     n  where n=0 if this is the first graph, otherwise n=m+1,
+                     where m is the largest number of any graph so far.
+
+              copygraph [integer]
+                     This creates a new graph, and copies all  the  attributes
+                     from  the  graph [integer]’s x and y axes, as well as its
+                     x_translate and y_translate  values,  the  clipping,  the
+                     legend  defaults, and the title defaults.   If the [inte‐
+                     ger] is omitted, then  it  copies  its  values  from  the
+                     ‘‘previous’’ graph, which is defined to be the graph with
+                     the largest number less than the currrent graph’s number.
+                     If  the  current  graph  has the smallest number, then it
+                     will take the  last  graph  from  the  previous  page  of
+                     graphs.  If there is no previous page, then an error will
+                     be flagged.  (copygraph does not copy the values  of  the
+                     hash_at, mhash_at, and hash_label attributes).
+
+              newpage
+                     This  command  is  for plotting graphs on multiple pages.
+                     After a newpage, the graphs that the user enters will  be
+                     plotted  on  a  new page.  New graphs and strings will be
+                     numbered starting with 0.  Essentially,  newpage  is  the
+                     same  as  appending together the output of separate calls
+                     of jgraph on the text before the newpage, and on the text
+                     after  the  newpage.   Newpage  will  most likely produce
+                     bizarre results if the −P option is not specified.
+
+              X [float]
+              Y [float]
+                     Postscript files to be embedded in LaTeX (and some  other
+                     programs)  contain  a  ‘‘bounding box’’ which defines the
+                     area which LaTeX will allocate for the postscript.  Other
+                     programs  use  this bounding box as well, sometimes using
+                     it to define where to clip the postscript image.   Jgraph
+                     uses the axis lines and labels, and the title to generate
+                     its bounding box.  Most of the time that’s good enough to
+                     work  in  LaTeX.   The  Y  and X commands say to make the
+                     height and width of the bounding box at  least  Y  and  X
+                     inches, respectively, but to maintain the current center‐
+                     ing of the graph.  If you still need further control over
+                     the  bounding box (e.g. to change the centering), try the
+                     bbox command.  If there’s  more  than  one  page  in  the
+                     jgraph  file,  Y, X and bbox values can be given for each
+                     graph.
+
+              bbox float float float float
+                     If the Y and X commands aren’t enough to help you  define
+                     a  good  bounding  box,  this command lets you explicitly
+                     enter one which will go directly into the jgraph  output.
+                     Its  units are the final postscript units.  It’s probably
+                     best to use the −p option to see what the bounding box is
+                     that  jgraph  produces,  and  then alter that accordingly
+                     with bbox.  The main use for this is to change the  auto‐
+                     matic centering that jgraph performs:  Usually the center
+                     of the bounding box that jgraph computes is  put  at  the
+                     center  of the page.  Changing the bbox changes this cen‐
+                     ter.
+
+              preamble : {string}
+              preamble {token}
+              epilogue : {string}
+              epilogue {token}
+                     These two commands allow the user to include  strings  or
+                     files  (the  token  specifies the filename) which will be
+                     copied directly into jgraph’s output.   The  preamble  is
+                     included  at the beginning of the output (after some ini‐
+                     tial postscript to set things up  for  jgraph),  and  the
+                     epilogue is included at the end.  A good use for the pre‐
+                     amble is to set up  a  postscript  dictionary  if  you’re
+                     using postscript marks.
+
+
+       GRAPH EDITING COMMANDS
+              These  commands act on the current graph.  Graph editing is ter‐
+              minated when one of the top‐level description commands is given.
+
+              xaxis
+              yaxis  Edit the x or y axis (see AXIS EDITING COMMANDS)
+
+              newcurve
+                     This  starts  editing a new curve of the graph (see CURVE
+                     EDITING COMMANDS).
+
+              curve {integer}
+                     This edits the curve denoted by {integer}.  If the  curve
+                     doesn’t  exist,  then  this command creates it and starts
+                     editing it.  Newcurve and curve interact as newgraph  and
+                     graph do.
+
+              newline
+                     This is an abbreviation for:
+
+                     newcurve marktype none linetype solid
+
+
+              copycurve [integer]
+                     This  starts editing a new curve of the graph, and copies
+                     all its values except for the points  from  curve  [inte‐
+                     ger.]  If  the  [integer]  is omitted, then it copies its
+                     values from the last curve in this graph.  If this  graph
+                     currently  has no curves, then it searches backwards from
+                     the previous graph.
+
+              title  This edits the title of the graph (see LABEL EDITING COM‐
+                     MANDS).   The  title is given a default location centered
+                     beneath the graph, and a default font size  of  12,  how‐
+                     ever, as with all labels, this can be changed.
+
+              legend The  edits  the  legend  of the graph (see LEGEND EDITING
+                     COMMANDS).  As a default, the graph will contain a legend
+                     if any of its curves have labels.
+
+              newstring
+                     This  edits  a  new  text  string (see LABEL EDITING COM‐
+                     MANDS).  This is useful as it allows  the  user  to  plot
+                     text on the graph as well as curves.
+
+              string {integer}
+              copystring [integer]
+                     String and copystring are to newstring as curve and copy‐
+                     curve are to newcurve.
+
+              border
+              noborder
+                     Border draws a square border around the area  defined  by
+                     the axes.  Noborder specifies no border.  Noborder is the
+                     default.
+
+              clip
+              noclip Clip specifies that all  curves  in  the  graph  will  be
+                     clipped ‐‐ that is, no points outside of the of axes will
+                     be plotted.  Clipping can also be  specified  on  a  per‐
+                     curve basis.  The default is noclip.
+
+              inherit_axes
+                     This is an old command which is kept for backward compat‐
+                     ibility.  Copycurve.  is equivalent to:
+
+                     newgraph inherit_axes
+
+
+              x_translate [float]
+              y_translate [float]
+                     By default, the bottom left‐hand corner of each graph  is
+                     at point (0,0) (final postscript units).  X_translate and
+                     Y_translate translate the bottom left‐hand corner of  the
+                     graph  [float]  inches.   The main use of this is to draw
+                     more than one graph on a page.  Note that jgraph  consid‐
+                     ers all the graphs drawn on the page when it computes its
+                     bounding box for centering.  Thus, if only one  graph  is
+                     drawn, it will always be centered on the page, regardless
+                     of its X_translate and Y_translate values.  These  values
+                     are used for relative placement of the graphs.
+                        To change the centering of the graphs, use bbox.
+
+              X [float]
+              Y [float]
+                     These  are the same as X and Y in the Top‐level commands,
+                     except that they let the user continue editing  the  cur‐
+                     rent graph.
+
+
+       SIMPLE AXIS EDITING COMMANDS
+              These  commands  act  on  the current axis as chosen by xaxis or
+              yaxis (see GRAPH EDITING  COMMANDS).   Axis  editing  terminates
+              when  a  graph  or  top‐level  command is given.  There are more
+              advanced axis editing commands given below which have to do with
+              moving  the  hash  marks, adding new hash marks and labels, etc.
+              See ADVANCED AXIS EDITING COMMANDS.
+
+              linear
+              log    Set the axis to be linear or logarithmic. The default  is
+                     linear.   If the axis is set to be logarithmic, then val‐
+                     ues <= 0.0 will be disallowed, as they  are  at  negative
+                     infinity on the axis.
+
+              min [float]
+              max [float]
+                     Set   the  minimum  and  maximum  values  of  this  axis.
+                     Defaults depend on the points given.  They can be seen by
+                     using the −p option.  Unless stated, all units (for exam‐
+                     ple point plotting, string plotting,  etc.)  will  be  in
+                     terms of the min and max values of the x and y axes.
+
+              size [float]
+                     Set the size of this axis in inches.
+
+              log_base [float]
+                     Set the base of the logarithmic axis. Default = 10.  This
+                     is the value which determines which hash marks  and  hash
+                     labels are automatically produced.
+
+              hash [float]
+                     Hash  marks  will  be [float] units apart.  Default = ‐1.
+                     If this value equals 0, then there will be no hash marks.
+                     If this value is less than 0, then the hash marks will be
+                     automatically set by jgraph (see −p for the  value).   By
+                     default,  each  hash mark will be labeled with its value.
+                     Hash and shash are ignored if the axes are logarithmic.
+
+              shash [float]
+                     Make sure there is a hash mark at the point [float] along
+                     the axis.  The default is set by jgraph if hash = ‐1.  If
+                     hash is set by the user, shash is defaulted  to  the  min
+                     value of the axis.
+
+              mhash [integer]
+                     Put  [integer]  minor  hash  marks between the above hash
+                     marks.  Default = ‐1.  If this value equals 0, then there
+                     will  be no minor hash marks.  If this value is negative,
+                     then the value will be chosen by jgraph (see −p  for  the
+                     value).
+
+              precision [integer]
+
+              hash_format token
+                     These  control  how  jgraph  formats  the  automatic hash
+                     labels.  The user shouldn’t have  to  worry  about  these
+                     values,  except  in extreme cases.  Jgraph uses printf to
+                     format  the  labels.   If  hash_format  is   ‘‘f’’   (the
+                     default), then the value of a hash label is printed with
+
+                   printf("%.*f", precision, value).
+
+              Other  valid  hash_format  values  are  ‘‘G’’, ‘‘g’’, ‘‘E’’, and
+              ‘‘e’’.  ‘‘G’’ is a good generic format which converts to  scien‐
+              tific  notation  if  the value becomes too big or too small.  If
+              the precision is negative, then jgraph chooses a  default:   For
+              ‘‘g’’  and  ‘‘G’’,  the  default is 6.  For ‘‘e’’ and ‘‘E’’, the
+              default is 0, and for ‘‘f’’, jgraph tries to determine a reason‐
+              able  default.   Please read the man page of prinf(1) for a com‐
+              plete description of how it formats floating point numbers.
+
+              label  Edit the label of this axis (see LABEL EDITING COMMANDS).
+                     By  default, the label is in font ‘‘Times‐Bold’’, and has
+                     a font size of 10.  If the user doesn’t change any of the
+                     plotting  attributes  of  the  label,  jgraph  chooses an
+                     appropriate place for the axis label.
+
+              draw_at [float]
+                     Draw the axis line at this point on the other axis.   The
+                     default  is  usually  the  other  axis’s  min, however if
+                     hash_scale is positive  (see  hash_scale  under  ADVANCED
+                     AXIS EDITING), it will be the other axis’s max.
+
+              nodraw Do not draw the axis, the hash marks or any labels.  This
+                     is useful for plotting points with no axes, and for over‐
+                     laying  graphs  on  top  of  one another with no clashes.
+                     This is equivalent to  no_draw_axis,  no_draw_axis_label,
+                     no_draw_hash_marks, and no_draw_hash_labels.
+
+              draw   Cancels  the  effect of nodraw.  Default = draw.  This is
+                     equivalent      to      draw_axis,       draw_axis_label,
+                     draw_hash_marks, and draw_hash_labels.
+
+              grid_lines
+              no_grid_lines
+                     Grid_lines  specifies  to  plot a grid line at each major
+                     hash mark on this axis.  The default is no_grid_lines.
+
+              mgrid_lines
+              no_mgrid_lines
+                     Mgrid_lines specifies to plot a grid line at  each  minor
+                     hash mark on this axis.  The default is no_mgrid_lines.
+
+
+       CURVE EDITING COMMANDS
+              These commands act on the current curve as chosen by newcurve or
+              curve (see GRAPH EDITING COMMANDS).   Curve  editing  terminates
+              when a graph or top‐level command is given.
+
+              pts [{float} {float}]*
+                     This  sets  the  points to plot in this curve.  The first
+                     float is the x value, and the second float is the y value
+                     of the point.  Points are plotted in the order specified.
+                     This command stops reading points  when  a  non‐float  is
+                     given.   The user can specify this command multiple times
+                     within a curve ‐‐ each time, simply more points are added
+                     to the curve.
+
+              x_epts [{float} {float} {float} {float}]*
+              y_epts [{float} {float} {float} {float}]*
+                     This  allows  the user to specify points and ‘‘confidence
+                     values’’ (otherwise known as ‘‘error bars’’).  The  first
+                     two  floats  specify  the x and y values of the point, as
+                     above.  If x_epts is  specified,   then  the  second  two
+                     floats specify range or confidence values for the x value
+                     of the point.  Error bars will  be  printed  to  each  of
+                     these  x values (using the original point’s y value) from
+                     the original point.  Similarly, y_epts specifies range or
+                     confidence  values  for  the  y  value of the point.  pts
+                     x_epts and y_epts can all be intermixed.
+
+              marktype
+                     This sets the kind of  mark  that  is  plotted  for  this
+                     curve.   Valid marks are: circle, box, diamond, triangle,
+                     x, cross, ellipse, xbar,  ybar,  text,  postscript,  eps,
+                     none,  and  variants of general.  Most of these are self‐
+                     explanatory, except for the last few:
+                       Xbar makes the curve into a bar  graph  with  the  bars
+                     going  to  the  x axis.  Ybar has the bars going to the y
+                     axis.
+                       Text lets the user plot text instead of  a  mark.   The
+                     text  is  editted as a label (see LABEL EDITING COMMANDS)
+                     immediately following the text  command.   The  x  and  y
+                     fields  of  the  label  have special meanings here:  They
+                     define where the label is to be printed  in  relation  to
+                     the  curve  points.  For example, if they are both 0, the
+                     label will be printed directly on the curve points.  If x
+                     is  1.0 and y is ‐1.0, then the label will be printed one
+                     unit to the right and one unit  below  the  curve  points
+                     (units  are  units  of  the x and y axes).  Default label
+                     values are 0 for x and y, and center justification.
+                       Postscript: See the postscript token below.
+                       Eps: See the eps token below.
+                       None means that no mark will be plotted (this is useful
+                     for drawing lines).
+                       There are four types of general marks, which work using
+                     the gmarks command described below.  The  four  marktypes
+                     are general, general_nf, general_bez, and general_bez_nf.
+                       By default, a new mark is chosen for each curve.
+
+              marksize [float] [float]
+                     This sets the size of the mark.  The first [float] is the
+                     width  of  the mark, and the second is the height.  Units
+                     are those of the x and y axes respectively,  unless  that
+                     axis  is logarithmic, in which case the units are inches.
+                     Negative marksizes are allowed (e.g.  a  negative  height
+                     will flip a triangle mark).  The default mark size can be
+                     determined using the −p option of jgraph
+
+              mrotate [float]
+                     This allows the user to rotate the mark [float]  degrees.
+                     Default is zero.
+
+              gray [float]
+              color [float float float]
+                     These  specify  either  the  grayness of the curve or its
+                     color.  Values for gray should be from  0  (black)  to  1
+                     (white).   Values  for  color should also be from 0 to 1.
+                     They are RGB values, and thus define the amount  of  red,
+                     green  and  blue  in  the curve respectively.  Specifying
+                     color nullifies the gray  value,  and  vice  versa.   The
+                     default is gray 0
+
+              fill [float]
+              cfill [float float float]
+                     This  sets  the  filling of marks which define an area to
+                     fill (e.g.  box, circle,  xbar).   fill  defines  a  gray
+                     value,  and  cfill  defines  a  color value (see gray and
+                     color above for a description of the units).  The default
+                     is fill 0 (black).
+
+              pattern token [float]
+                     This defines the how the mark is to be filled.  Token may
+                     be solid (the default), stripe, or  estripe.   If  solid,
+                     then  the  float  is  ignored, and the mark is completely
+                     filled in with either the gray value defined by  fill  or
+                     the  color  value  defined by cfill.  If stripe, then the
+                     mark will be filled with stripes of either the gray value
+                     defined  by  fill  or  the  color  defined by cfill.  The
+                     stripes will be rotated by float degrees.   Estripe  dif‐
+                     fers  from  stripe only in that stripe draws stripes on a
+                     white background, while estripe simply draws the  stripes
+                     on an empty background.
+
+              poly
+              nopoly
+              pfill [float]
+              pcfill [float float float]
+              ppattern token [float]
+                     Poly  allows the user to make jgraph treat the curve as a
+                     closed polygon (or in the case  of  a  bezier,  a  closed
+                     bezier  curve).   pfill, pcfill and ppattern  specify the
+                     filling of the polygon, and work  like  fill,  cfill  and
+                     pattern above.  The default is nopoly.
+
+              gmarks [{float} {float}]*
+                     Gmarks is a way for the user to define custom marks.  For
+                     each mark on (x,y), Each pair  of  {float_x},  {float_y},
+                     will  define  a  point  on the mark (x + (float_x * mark‐
+                     size_x / 2), y + (float_y * marksize_y / 2)).
+                       Thus, for example, the box mark could be defined as
+
+                   gmarks ‐1 ‐1 ‐1 1 1 1 1 ‐1
+                   marktype general
+
+              The  marktypes  general,  general_nf,  general_bez,   and   gen‐
+              eral_bez_nf, allow the gmarks points to define a closed polygon,
+              a line, a closed bezier curve and a regular bezier curve respec‐
+              tively (the ‘‘nf’’ stands for ‘‘non‐filled’’).
+
+              postscript : {string}
+              postscript {token}
+                     This  allows  the  user  to  enter direct postscript as a
+                     mark.  It automatically sets the marktype to  postscript.
+                     If  a  string is entered, then that string is used as the
+                     mark in the jgraph output.  If a token is  entered,  then
+                     that  token  must  stand  for  a  filename, which will be
+                     copied to the output once for every mark.  The postscript
+                     will  be set up so that when the string or file is put to
+                     the output, (0, 0) of the the axes is in  the  middle  of
+                     the mark, it is rotated by mrotate degrees, and scaled by
+                     (marksize_x / 2), marksize_y / 2).  Thus,  the  box  mark
+                     could be defined as:
+
+                   postscript : 1 setlinewidth ‐1 ‐1 moveto ‐1 1 lineto \
+                                1 1 lineto 1 ‐1 lineto ‐1 ‐1 lineto stroke
+
+              If  the  marksize_x is defined to be (0, 0), then jgraph does no
+              scaling.  This is useful when the postscript  has  strings,  and
+              the user does not want the strings to be scaled.
+
+              eps {token}
+                     This  allows  the  user  to include an encapsulated post‐
+                     script file and treat it as  a  mark.   It  automatically
+                     sets  the  marktype  to  eps.  The file will be scaled so
+                     that the bounding box is  marksize  units.   Among  other
+                     things,  this  allows  the  user  to include whole jgraph
+                     files as marks.  Please see ad.jgr,  explained  in  HINTS
+                     AND  EXAMPLE GRAPHS below for an example of this feature.
+
+              larrows
+              rarrows
+              nolarrows
+              norarrows
+                     Rarrows specifies to draw an arrow at the  end  of  every
+                     line  segment in the curve.  Larrows specifies to draw an
+                     arrow at the beginning of every line segment.   The  size
+                     of the arrows can be changed by using asize.  The default
+                     is nolarrows and norarrows.
+                       Arrows always go exactly to the point  specified,  with
+                     the  exception  of  when  the marktype is ‘‘circle’’.  In
+                     this case, the arrow goes to the edge of the circle.
+
+              larrow
+              rarrow
+              nolarrow
+              norarrow
+                     This is analgous to the above, except that  with  larrow,
+                     the  only  arrow  drawn  is to the beginning of the first
+                     segment in the curve, and with  rarrow,  the  only  arrow
+                     drawn is to the end of the last segment.
+
+              asize [float] [float]
+                     This sets the size of the arrows.  The first [float] con‐
+                     trols the arrow’s width.  Its units are those of  the  x‐
+                     axis.   The  second  [float] controls the arrow’s height.
+                     It is in the units of the y‐axis.  Use the ‐p  option  of
+                     jgraph to see the default values.
+
+              afill [float]
+              afill [float]
+              apattern token [float]
+                     These  control  the  grayness  or  color  of  arrowheads.
+                     Afill, acfill and apattern work in the same way as  fill,
+                     cfill  and pattern described above.  The default is afill
+                     0 (black).
+
+              linetype [token]
+                     This defines the type of the line connecting the  points.
+                     Valid  entries  are solid, dotted, dashed, longdash, dot‐
+                     dash, dotdotdash, dotdotdashdash, general, and none.  The
+                     default  is  none.   General lets the user define his own
+                     linetype  using  the  glines  command  described   below.
+                     Points  are  connected  in  the  order  in which they are
+                     inserted using the pts command.
+
+              glines [float]*
+                     This lets the user specify the exact dashing of  a  line.
+                     The format is as in postscript ‐‐ the first number is the
+                     length of the first dash, the second is the length of the
+                     space  after  the  first dash, etc.  For example, dotdash
+                     could be defined as ‘‘glines 5 3 1 3’’.
+
+              linethickness [float]
+                     This defines the line thickness (in  absolute  postscript
+                     units) of the connecting line.  Default = 1.0.
+
+              bezier
+              nobezier
+                     Bezier specifies to use the curve’s points to define suc‐
+                     cessive bezier curves.  The first point is  the  starting
+                     point.   The  next  two are control points for the bezier
+                     curve and the next point is the ending point.   If  there
+                     is  another  bezier, this ending point is also the begin‐
+                     ning point of the next curve.  The next  two  points  are
+                     again  control  points,  and the next point is the ending
+                     point.  Thus, a bezier must have a  total  of  (3n  +  1)
+                     points, where n is at least 1.
+                       In  bezier curves, marks and arrows only apply to every
+                     third point.  Nobezier is the default.
+
+
+              clip   This specifies that this curve will be  clipped  ‐‐  that
+                     is, no points outside of the of axes will be plotted.
+
+              noclip This  turns  off clipping.  If clipping was specified for
+                     the entire graph, then noclip has no effect.   Noclip  is
+                     the default.
+
+              label  This  edits  the  label of this curve for the purposed of
+                     drawing a legend.  (see LABEL EDITING COMMANDS and LEGEND
+                     EDITING  COMMANDS).   Unless  the legend entry is custom,
+                     setting any label attribute except for  the  text  itself
+                     will have no effect.
+
+
+       LABEL EDITING COMMANDS
+              The  following  commands  are  used  for editing labels.  Unless
+              stated otherwise, the defaults are written  with  each  command.
+              Label  editing terminates when one of these tokens is not given.
+
+              : {string}
+                     This sets the string of the label.  If no string is  set,
+                     the label will not be printed.
+
+              x [float]
+              y [float]
+                     This  sets the x or y coordinate of the label.  Units are
+                     the units of the x and y axes respectively.
+
+              font [token]
+                     This sets the font.  Default is usually  ‘‘Times‐Roman’’.
+
+              fontsize [float]
+                     This  sets the fontsize in points.  Default is usually 9.
+
+              linesep [float]
+                     This  sets  the  distance  between  lines  in  multilined
+                     labels.   Units are points.  The default is the fontsize.
+
+              hjl
+              hjc
+              hjr    These set the horizontal justification to  left,  center,
+                     and right, respectively.  Default = hjc.
+
+              vjt
+              vjc
+              vjb    These  set  the vertical justification to top center, and
+                     bottom, respectively.  Default = vjb.
+
+              rotate [float]
+                     This will rotate the string [float] degrees.   The  point
+                     of  rotation  is  defined by the vj and hj commands.  For
+                     example, to rotate 90  degrees  about  the  center  of  a
+                     string, one would use vjc hjc rotate 90.
+
+              lgray [float]
+              lcolor [float float float]
+                     These control the color or the grayness of the label.  It
+                     works just as gray and color do for curves and axes.  The
+                     default depends on the context.  For example, for strings
+                     and the title, the default is black.  For axis labels and
+                     hash  labels,  the default is the color of the axis.  For
+                     text as marks, the default is the curve color.
+
+
+       LEGEND EDITING COMMANDS
+              These commands allow the user to alter  the  appearance  of  the
+              legend.   Legends  are  printed out for each curve having a non‐
+              null label.  The legend entries are printed out in the order  of
+              ascending curve numbers.  Legend editing terminates when a graph
+              command or top level command is issued.
+
+              In earlier versions of jgraph (before version 8.0), the  charac‐
+              teristics  of each legend entry were set in the label portion of
+              the entry’s curve.   Thus,  for  example,  if  you  wanted  each
+              entry’s  fontsize  to  be  18, you had to set it in each entry’s
+              curve.  Now, default legend entry characteristics are set  using
+              the  defaults  keyword.   Unless  a  custom legend is specified,
+              these default values override any  values  set  in  the  entry’s
+              curve.   Thus,  to  get all entries to have a fontsize of 18, it
+              must be set using defaults fontsize 18.
+
+              If legend editing seems cryptic, try the following example:
+
+            newgraph
+            newcurve marktype box linetype solid label : Solid box
+                 pts 0 0 1 1 2 1 3 1
+            newcurve marktype circle linetype dotted label : Dotted circle
+                 pts 0 1 1 2 2 2 3 2
+            newcurve marktype x linetype dashed label : Dashed x
+                 pts 0 2 1 3 2 3 3 3
+               legend defaults
+                 font Times‐Italic fontsize 14 x 1.5 y 3.5 hjc vjb
+
+       The legend of this graph should be centered over the top of the  graph,
+       and all legend entries should be 14pt Times‐Italic.
+
+              on
+              offThese turn printing of the legend on and off.  The default is
+              on
+                     (but,  of  course,  if there are no curve labels defined,
+                     there will be no legend).
+
+              linelength [float]
+                     This sets the length of the line printed in front of leg‐
+                     end  entries  corresponding  to  curves which have lines.
+                     Units are those of the x axis, unless the x axis is loga‐
+                     rithmic, in which case the units are inches.  The default
+                     may be gotten using the −p option.
+
+              linebreak [float]
+                     This sets the vertical distance between individual legend
+                     entries.   Units  are  those  of the y axis, unless the y
+                     axis is logarithmic, in which case the units are  inches.
+                     The default may be gotten using the −p option.
+
+              midspace [float]
+                     This  sets  one  of  two  things.   If  any of the legend
+                     entries have lines in them, then this sets  the  distance
+                     between  the  end  of the line and the legend entry text.
+                     Otherwise, this sets the distance between center  of  the
+                     mark and the legend entry text.  Units are those of the x
+                     axis, unless the x axis is logarithmic, in which case the
+                     units are inches.  The default may be gotten using the −p
+                     option.
+
+              defaults
+                     This lets the user change the attributes  of  all  legend
+                     entries.   The defaults are editted as a label (see LABEL
+                     EDITING COMMANDS).  A few of the label fields  have  spe‐
+                     cial  meanings:   The  :  field  is ignored.  The x and y
+                     fields define where the label will be  printed.   The  hj
+                     and  vj  fields  define  the  justification of the legend
+                     about the x and y point.  Thus, if x is 10 and y  is  15,
+                     and  hjc  vjb are specified, then the legend will be cen‐
+                     tered horizontally about x=10, and the bottom of the leg‐
+                     end  will  be placed on y=15.  This is analagous to label
+                     plotting.  The rotate field is also  analagous  to  label
+                     plotting.
+
+                     Defaults  are as follows.  Rotate is 0.  font is ‘‘Times‐
+                     Roman’’ and fontsize is 9.  The color is black.   Default
+                     justification is hjl and vjc.  The default x and y values
+                     are set according to the hj and vj fields.   See  the  −p
+                     option.
+
+              left
+              right  These  will automatically produce a legend to the left or
+                     the right of the graph.  Left is equivalent  to  defaults
+                     hjr vjc and right is equivalent to defaults hjl vjc.
+
+              top
+              bottom These  will  automatically produce a legend on the top or
+                     the bottom of the graph.  Top is equivalent  to  defaults
+                     hjl vjb
+                      and bottom is equivalent to defaults hjl vjt.
+
+              x [float]
+              y [float]
+                     These  are  included mainly for backward compatability to
+                     earlier versions of jgraph.  Setting x and y  is  equiva‐
+                     lent to ‘‘defaults x float y float hjl vjt’’
+
+              custom This  lets  the user control where each individual legend
+                     entry goes.   The  values  of  the  defaults  fields  are
+                     ignored,  and  instead,  the values of the curve’s labels
+                     are  used.   All  justifications  have  defined  results,
+                     except  for  hjc.   Similarly,  rotation  other than 0 is
+                     likely to produce bad effects.
+
+
+       ADVANCED AXIS EDITING
+              These are more advanced commands  for  editing  an  axis.   This
+              includes drawing explicit hash marks and labels, moving the hash
+              marks, axes, and labels, not drawing  the  hash  marks,  labels,
+              axes, etc.
+
+              gray [float]
+              color [float float float]
+                     These  specify  either  the  grayness  of the axis or its
+                     color.  Values for gray should be from  0  (black)  to  1
+                     (white).   Values  for  color should also be from 0 to 1.
+                     They are RGB values, and thus define the amount  of  red,
+                     green  and  blue  in  the  axis respectively.  Specifying
+                     color nullifies the gray  value,  and  vice  versa.   The
+                     default is gray 0.  These values affect every part of the
+                     axis:  the label, the hash marks  and  labels,  the  axis
+                     line and the grid lines.
+
+              grid_gray [float]
+              grid_color [float float float]
+              mgrid_gray [float]
+              mgrid_color [float float float]
+                     These  allow  the user to define the grayness or color of
+                     the gridlines and the mgridlines  to  be  different  from
+                     those  of  the  axis  lines.   The  default grid_gray and
+                     grid_color is the same as the axis’s gray and color.  The
+                     default   mgrid_gray  and  mgrid_color  is  the  same  as
+                     grid_gray and grid_color.
+
+              hash_at [float]
+                     Draw a hash mark at this point.  No  label  is  made  for
+                     this hash mark.
+
+              mhash_at [float]
+                     Draw a minor hash mark at this point.
+
+              hash_label
+                     Edit a hash label (see HASH LABEL EDITING COMMANDS).
+
+              hash_labels
+                     Edit  the  default  characteristics  of  the hash labels.
+                     This is so that the user can change the fontsize,  justi‐
+                     fication,  etc., of the hash labels.  Editing hash_labels
+                     is just like editing normal  labels  (see  LABEL  EDITING
+                     COMMANDS),  except  that  the  :, x, and y values are all
+                     ignored. Defaults for hash labels are as  follows:  Font‐
+                     size=9,  Font=‘‘Times‐Roman’’, Justification is dependent
+                     on whether it is the x or y axis and  whether  hash_scale
+                     is positive or negative.
+
+              hash_scale [float]
+                     This  is  to  change the size and orientation of the hash
+                     marks.  Default = ‐1.0.  Changing this to ‐2.0 will  dou‐
+                     ble  the length of the hash marks.  Changing this to +1.0
+                     will make the hash marks come above or to  the  right  of
+                     the axis.
+
+              draw_hash_marks_at [float]
+                     By  default,  the  hash  marks  are drawn either above or
+                     below the axis.  This  command  changes  where  they  are
+                     drawn.   Hash_scale  still  determines  whether  they are
+                     drawn above or below this point, and their size.
+
+              draw_hash_labels_at [float]
+                     By default, the hash labels are  drawn  either  above  or
+                     below  the  hash  marks  (again,  this  is  dependent  on
+                     hash_scale).  This command changes where they are  drawn.
+                     Justification and fontsize, etc., can be changed with the
+                     hash_labels command.
+
+              auto_hash_marks
+              no_auto_hash_marks
+                     This toggles whether or  not  jgraph  will  automatically
+                     create  hash marks according to hash, mhash and shash (or
+                     log_base and mhash for logarithmic axes).  The default is
+                     auto_hash_marks.
+
+              auto_hash_labels
+              no_auto_hash_labels
+                     This  toggles  whether  or  not jgraph will automatically
+                     create hash labels for the  auto_hash_marks.   Default  =
+                     auto_hash_labels.
+
+              draw_axis
+              no_draw_axis
+                     This  toggles  whether  or  not  the  axis line is drawn.
+                     Default = draw_axis.
+
+              draw_axis_label
+              no_draw_axis_label
+                     This toggles whether or not the axis label (as editted by
+                     the  label command) is drawn.  Default = draw_axis_label.
+
+              draw_hash_marks
+              no_draw_hash_marks
+                     This toggles whether or not the hash  marks  (both  auto‐
+                     matic  and  those  created with hash_at and mhash_at) are
+                     drawn.  Default = draw_hash_marks.
+
+              draw_hash_labels
+              no_draw_hash_labels
+                     This toggles whether or not the hash  labels  are  drawn.
+                     Default = draw_hash_labels.
+
+
+       HASH LABEL EDITING COMMANDS
+              Hash  labels  are  simply  strings printed along the appropriate
+              axis.  As a default, they are printed at the  place  denoted  by
+              the  most recent hash_at or mhash_at for this axis, but this can
+              be changed by the at command.  If there has been no  hash_at  or
+              mhash_at,  then an at command must be given, or there will be an
+              error.  Hash editing terminates when either one  of  these  com‐
+              mands is not given.
+
+              : {string}
+                     This sets the string of the hash label (see Strings above
+                     under THE DESCRIPTION LANGUAGE).
+
+              at [float]
+                     This sets the location of the hash label along  the  cur‐
+                     rent axis.
+
+
+FUNCTION PLOTTING AND OTHER NON‐INHERENT FEATURES
+       Although  jgraph  doesn’t have any built‐in functions for interpolation
+       or function plotting, both can be effected in jgraph with a little out‐
+       side help:
+
+       Function plotting
+              With the include and shell statement, it’s easy to create a file
+              of points of a function with a c or awk program, and include  it
+              into  a  graph.  See the section HINTS AND EXAMPLE GRAPHS for an
+              example of a sin graph produced in this manner.
+
+       Point interpolation
+              Point interpolation is essentially the same  as  function  plot‐
+              ting,  and  therefore is left out of jgraph.  The UNIX spline(1)
+              routine is a simple way to  get  interpolation  between  points.
+              See bailey.jgr described below.  Maybe in a future release.
+
+HINTS AND EXAMPLE GRAPHS
+       Jgraph should be able to draw any kind of scatter/line/bar graph that a
+       user desires.  To embellish the graph with  extra  text,  axes,  lines,
+       etc.,  it  is  helpful  to use copygraph.  The following example graphs
+       show a few examples of different features of jgraph.  They should be in
+       the directory JGRAPH_DIR.
+
+       ‐  acc.jgr is a simple bar graph.  Acc.tex is also included to show how
+       one can include the output of jgraph in a LaTeX file.  To get  this  to
+       work,  you  might  have  to  substitute the entire pathname of the file
+       acc.jps in the acc.tex file.
+
+       ‐ g8.jgr is a simple graph with some plotted text.  ‐  g8col.jgr  shows
+       how to produce a color background ‐‐ it is
+         the same as g8.jgr only all on a yellow background.  ‐ ebars.jgr is a
+       simple graph with error bars.  ‐ sin.jgr shows how a sin  function  can
+       be plotted using a simple c program to produce the sin wave.  Moreover,
+       this file shows a use of copygraph to plot an extra x and y axis at the
+       0 point.
+
+       ‐ sin1.jgr is a further extension of sin.jgr only with one x and y axis
+       at 0, but with the axis labels at the left and the bottom of the graph.
+
+       ‐ sin2.jgr is a different sin wave with a logarithmic x axis.
+
+       ‐  sin3.jgr  shows  how  a  bizarre effect can be gotten by sorting the
+       points in a different manner.
+
+       ‐ bailey.jgr shows how to use the UNIX spline(1) routine to get  inter‐
+       polation between points.
+
+       ‐  gpaper.jgr  shows  how  you  can  get jgraph to easily produce graph
+       paper.
+
+       ‐ g9n10.jgr contains two graphs with complicated legends.  It  contains
+       a description of how the legend was created.
+
+       ‐  ex1.jgr and ex2.jgr are two examples which were figures 1 and two in
+       an extended abstract for a paper about jgraph.
+
+       ‐ mab2.jgr is a graph created by Matt Blaze which shows how  a  compli‐
+       cated  output  graph can be quite concisely and simply stated.  In this
+       graph, the x axis is a time line.  It shows usage of the hash_label and
+       hash_labels commands, as well as displaying how jgraph lets you extract
+       data from output files with awk.
+
+       ‐ nr.jgr is an example of a rather complicated bar graph  with  stripe‐
+       filled bars.  It was created by Norman Ramsey.
+
+       ‐ hypercube.jgr shows an interesting use of jgraph for picture‐drawing.
+
+       ‐ ad.jgr is an example which shows how one can include jgraph output as
+       jgraph  input.   The  file  uses  the  eps token to include cube.jgr, a
+       jgraph drawing of an Intel hypercube, and disk.jgr, a jgraph drawing of
+       a disk, in a picture.
+
+       ‐  alb.jgr is another use of jgraph for picture drawing.  This file was
+       created by an awk script which Adam Buchsbaum wrote to draw  trees  and
+       graphs.
+
+       ‐  wortman.jgr is a neat graph of processor utilization written by Dave
+       Wortman for SIGPLAN ’92.  It was created by an awk script,  which  pro‐
+       cessed the data and emitted the jgraph.
+
+       To view these graphs, use jgraph ‐P, and view the resulting output file
+       with gs, or a similar postscript viewer.  To make a hard copy of  these
+       graphs, pipe the output of jgraph ‐P directly to lpr.
+
+
+USING JGRAPH TO DRAW PICTURES
+       As  hypercube.jgr  and alb.jgr show, jgraph can be used as a postscript
+       preprocessor to make drawings.  There are two advantages  using  jgraph
+       to  draw  pictures  instead  of using standard drawing tools like xfig,
+       figtool, or idraw.  The first is that with  jgraph,  you  know  exactly
+       where  strings,  lines,  boxes, etc, will end up, because you plot them
+       explicitly.  The second advantage is that for iterative drawings,  with
+       lots of patters, you can combine jgraph with awk or c or any other pro‐
+       gramming language to get complex output in a simple  way.   Most  what‐
+       you‐see‐is‐what‐you‐get (WYSIWYG) drawing tools cannot do this.
+
+       The  major disadvantage of using jgraph to draw pictures is that jgraph
+       is not WYSIWYG.  You have to set up axes and  plot  points,  lines  and
+       strings.  It’s all a matter of taste.
+
+       If  you’d  like to see some more complex pictures drawn with jgraph, as
+       well as some hints  to  make  picture‐drawing  easier,  send  me  email
+       (jsp@princeton.edu).
+
+
+EMBEDDING THE OUTPUT IN LATEX
+       I  haven’t  read the manuals, but the way I’ve been loading these files
+       into LaTeX has been as follows:
+
+       1.  Toward the beginning of my LaTeX file, I’ve had ‘‘\input{psfig}’’
+       2.  Where I’ve wanted my file, I’ve put:
+
+           \begin{figure}
+           \centerline{\psfig{figure=<path‐name>/<filename‐of‐jgraph‐output>}}
+           \end{figure}
+
+           Some versions of dvips or dvi2ps work without the path‐name.  Others
+           require that the path‐name be present.
+
+       3.  After running latex on the file, do
+
+           lpr ‐d file.dvi
+
+       4.  If that doesn’t work, try dvips‐ing the file and printing the postscript.
+
+
+
+BUGS
+       Logarithmic axes cannot contain points <= 0.  If  I  have  enough  com‐
+       plaints to convince me that this is a bug, I’ll try to fix it.
+
+       There is no real way to make the axes such that they decrease from left
+       to right or low to high ‐‐ or at least not  without  writing  your  own
+       hash labels.
+
+       There may well be loads of other bugs.  Send to jsp@princeton.edu.
+
+
+       This is $Revision: 8.3 $.
+
+
+
+                                                                     jgraph(1)
+

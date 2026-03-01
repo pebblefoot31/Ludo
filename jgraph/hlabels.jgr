@@ -1,0 +1,50 @@
+newgraph
+
+(* Set up the x axis to have three points. 
+   Give it a little extra room to the right and left.
+   The shash says to line up the hash marks so that
+   if zero were on the axis, there would be a hash
+   mark at zero. *)
+
+xaxis size 1 min .8 max 3.2 hash 1 mhash 0 shash 0
+
+    (* Don't produce hash labels automatically, but
+       instead put three custom labels at hash marks
+       1, 2 and 3. *)
+    no_auto_hash_labels          
+    hash_label at 1 : Kilobyte
+    hash_label at 2 : Megabyte
+    hash_label at 3 : Gigabyte
+
+    (* This sets the font and font size of the labels, it also
+       says to left/center justify them and rotate them down 
+       60 degrees. *)
+
+    hash_labels fontsize 12 font Times-Italic hjl vjc rotate -60
+
+(* The y axis is more standard. *)
+
+yaxis size 2 min 0 max 15 hash 5 mhash 4
+
+  (* However, we're adding a labeled hash mark at 13.5 *)
+
+  hash_at 13.5 hash_label at 13.5 : Control
+
+  hash_labels fontsize 12    (* And we're setting the font size to 12 *)
+  grid_lines grid_gray .7    (* And drawing grid lines at a grey level of 0.7 *)
+
+(* Draw a reference line at y=13.5 through the whole graph *)
+
+newline pts 0.8 13.5 3.2 13.5
+
+(* This is a bad part of jgraph -- when you draw the gray grid lines, it
+   makes the x axis gray.  I'm drawing this line to make it black again. *)
+
+newline pts 0.8 0 3.2 0
+
+(* And draw a red curve with red boxes and a doubly thick line *)
+
+newcurve marktype box color 1 0 0 
+         linetype solid color 1 0 0 
+         linethickness 2
+   pts 1 8  2 11  3 15
