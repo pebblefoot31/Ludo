@@ -32,9 +32,8 @@ The colored triangles in the center represent home.
 ## Building and Running
 
 1. Clone this repository
-2. Make sure to be one level up from the untarred /jgraph directory 
-3. Run `make` to generate images corresponding to each of the data files in `input`
-4. Run `xdg-open rolls1.jpg` to view the generated image of the board
+2. Run `make` to generate images corresponding to each of the data files in `input`
+3. Run `xdg-open rolls*.jpg` to view the generated images of every board (or whatever command opens jpg files on your machine)
 
 ## Additional Notes
 - There is a shell script in this repo called `gen_num.sh`. This script generates random numbers that simulate dice rolls. The output is in a file called rolls.txt
